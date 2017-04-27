@@ -1,0 +1,105 @@
+
+\documentclass[12pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{graphicx}
+\usepackage{csquotes}
+
+\graphicspath{ {figs/} }
+
+\title{Project Proposal: Parallel AI for ``Super Smash Bros. N64"}
+\author{
+        Ryan Leonard \\
+        Boyana Norris \\
+        CIS 531: \\
+        Parallel Computing
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+We will pit a player against our AI at .
+
+\subsection{Assumptions}
+Kirby is our AI Player and champion.
+The human is the evil Donky Kong.
+We are playing on Kirby's level.
+The only moves that Player and AI can perform is to move left, move right, and basic punch. 
+%Kirby is honorable so he will also obey these rules.
+
+\subsection{Computer Vision}
+\begin{enumerate}
+\item Detecting each players position
+\end{enumerate}
+
+\subsection{Machine Learning}
+\begin{enumerate}
+\item Determine the enemies probable move in the next $k$ frames
+\item Rate each of my possible moves for the next frame.
+\item Notice that the prior point it might be intelligent to rate the next $k$ frames and use that information with a weighted mean function that makes it so that the next frame best move is determined using the possible ranking of the move made 10 frames from now.
+\end{enumerate}
+
+\subsubsection{Input Data}
+A sequence/window of 100 frames up until some physical exchange.
+Each frame will consist of:
+\begin{itemize}
+\item AI Position
+\item AI Velocity
+\item AI Movement Input
+\item AI Attack Input
+\item Enemy Position
+\item Enemy Velocity
+\item Enemy Movement Input
+\item Enemy Attack Input
+\end{itemize}
+
+\subsubsection{Training Labels}
+Damage ratio is going to be our label for each datum.
+We calculate this in the same sliding window fashion as well, i.e. last 100 frames. 
+We can make the label modal by saying there is 4 different labels:
+\begin{tabular}{|c|c|l|}
+Label & Damage Ratio & Note \\\hline
+kick-ass & $>10$ & AI is doing excellent \\
+kicking & $>0$ & AI is doing well \\
+kicked & $<0$ & AI is doing poorly  \\
+ass-kicked & $<10$ & AI is doing horribly 
+\end{tabular}
+
+\section{Discussion}
+\subsection{Getting access to controller, graphics, etc.}
+We will look at the Project64 plugins and tweaking them to get access to these components.
+If we can find an open source version of the plugins that would make it much easier to pass all of our outputs up.
+It is perfectly acceptable to look at the inputs directly from the controller.
+
+\begin{verbatim}
+
+          +-------+
+          |AI Eng.| 
+          +-------+
+          ^      ^
+         /        \
+  +--------+       \
+  |Graphics|        \
+  +--------+         v
+      ^         +---------+   
+       \        | Control | 
+        \       +---------+
+         \          ^
+          \        /
+           \      /
+            v    v
+          +-------+
+          |  N64  | 
+          +-------+
+\end{verbatim}
+Our AI Engine takes inputs from Graphics (i.e. it gets information from each frame for Computer Vision).
+Additionally, inputs may be take from the control plugin to get more concrete information about 
+Notice that the only inputs that our AI Engine has is into 
+
+
+\section{Considerations}
+Will consider buying an N64 controller for PC.
+
+\end{document}

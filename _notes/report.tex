@@ -1,0 +1,44 @@
+\documentclass[12pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{graphicx}
+\usepackage{csquotes}
+
+\graphicspath{ {figs/} }
+
+\title{Report: Static Taint Analysis using Finite Automata}
+\author{
+        Ryan Leonard \\
+        Michal Young \\
+        CIS 561: \\
+        Compiler Construction
+}
+\date{\today}
+
+
+\begin{document}
+
+\newcommand{\authgould}{ Gould et. al }
+\newcommand{\authchris}{ Christensen et. al }
+\newcommand{\authyu}{ Yu et. al }
+\maketitle
+
+\nocite{gould04}
+\nocite{chris03}
+\nocite{yu14}
+
+\section{Beating the World's Best at Super Smash Bros. Melee with Deep Reinforcement Learning}
+
+In this paper, there are two reinforcement learning approeaches tried to compete at Super Smash Bros. Melee (SSBM).
+This game is very similar to the game we are working with.
+Their approach to data collection is very similar to ours, except they explicitely do not use the buffer information.
+They instead get precise information from memory space.
+
+They use two RL techniques, Q-Learning (which seems to be learning the 'value-function'.
+Second they use the 'policy-gradient' method which is referred to as 'actor-critics'.
+
+\section{Automata-based Symbolic String Analysis for Vulnerability Detection}
+
+\bibliographystyle{ieeetr}
+\bibliography{report}
+
+\end{document}
