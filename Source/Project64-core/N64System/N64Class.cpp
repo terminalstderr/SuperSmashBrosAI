@@ -28,6 +28,8 @@
 #include <utime.h>
 #endif
 
+#include "SSBAI.h"
+
 #pragma warning(disable:4355) // Disable 'this' : used in base member initializer list
 
 CN64System::CN64System(CPlugins * Plugins, bool SavesReadOnly, bool SyncSystem) :
@@ -2094,10 +2096,17 @@ void CN64System::SyncToAudio()
     }
 }
 
+
 void CN64System::RefreshScreen()
 {
     PROFILE_TIMERS CPU_UsageAddr = Timer_None/*, ProfilingAddr = Timer_None*/;
     uint32_t VI_INTR_TIME = 500000;
+
+	{
+		void *buf;
+		ssbai::Hooks::initialize(&buf, (void**)&g_MMU);
+	}
+
 
     if (bShowCPUPer()) { CPU_UsageAddr = m_CPU_Usage.StartTimer(Timer_RefreshScreen); }
 
