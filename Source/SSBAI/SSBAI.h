@@ -17,15 +17,6 @@ namespace ssbai
 		static SSBAI_API void frame_update();
 	};
 
-	class AI
-	{
-	private:
-		void *frame_buf;
-		void *mem_buf;
-	public:
-		AI();
-		void set_frame_buffer(void **buf);
-		void set_mem_buffer(void **buf);
-	};
+
 }
 

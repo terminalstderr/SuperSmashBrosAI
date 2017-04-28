@@ -4,12 +4,16 @@
 #include "stdafx.h"
 #include <iostream>
 #include "SSBAI.h"
+#include "AiEngine.h"
 
 
 namespace ssbai
 {
 	// Global SSBAI objects
-	AI ai_engine;
+	AiEngine ai_engine;
+	State current_state;
+	Action current_action;
+	Action next_action;
 	bool initialized = false;
 
 	void Hooks::initialize(void** frame_buffer, void **mem_buffer)
@@ -25,23 +29,17 @@ namespace ssbai
 
 	void Hooks::frame_update() 
 	{
+		// Need to construct the current state
+		current_state.update();
+		// need to retain the action from the last step...
+		next_action = ai_engine.next_action(current_state, current_action);
+		// On every frame, we will do 
+		// ai_engine.step()
+		// When training -- 
+		// 1. the step will perform a prediction based on the state
+		// 2. the step will perform an update based on 
 		// TODO: ai_engine.predict();
 		// TODO: ai_engine.update();
 	}
-
-
-	AI::AI() {
-	}
-
-	void AI::set_frame_buffer(void ** buf)
-	{
-		this->frame_buf = *buf;
-	}
-
-	void AI::set_mem_buffer(void ** buf)
-	{
-		this->mem_buf = *buf;
-	}
-
 }
 
