@@ -2191,9 +2191,9 @@ void CN64System::RefreshScreen()
         m_Cheats.ApplyCheats(g_MMU);
     }
     //    if (bProfiling)    { m_Profile.StartTimer(ProfilingAddr != Timer_None ? ProfilingAddr : Timer_R4300); }
-	{
-		ssbai::Hooks::frame_update(g_MMU);
-	}
+
+	// Our Hook into Project64
+	ssbai::Hooks::frame_update(g_MMU->Rdram(), &(m_Buttons[0]), &(m_Buttons[1]));
 }
 
 void CN64System::TLB_Mapped(uint32_t VAddr, uint32_t Len, uint32_t PAddr, bool bReadOnly)

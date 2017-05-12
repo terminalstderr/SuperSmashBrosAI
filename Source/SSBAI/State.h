@@ -9,8 +9,8 @@ class PlayerState {
 
 public:
 	PlayerState();
-	void update_p1(void *memory_offset);
-	void update_p2(void *memory_offset);
+	void update_p1(uint8_t *memory_offset);
+	void update_p2(uint8_t *memory_offset);
 };
 
 class State {
@@ -23,6 +23,6 @@ private:
 public:
 	~State();
 	State();
-	void update(void *memory_offset);
+	void update(uint8_t *memory_offset);
 };
 
