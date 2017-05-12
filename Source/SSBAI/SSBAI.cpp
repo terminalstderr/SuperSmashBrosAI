@@ -16,21 +16,10 @@ namespace ssbai
 	Action next_action;
 	bool initialized = false;
 
-	void Hooks::initialize(void** frame_buffer, void **mem_buffer)
-	{
-		if (initialized) 
-		{
-			return;
-		}
-		ai_engine.set_frame_buffer(frame_buffer);
-		ai_engine.set_mem_buffer(mem_buffer);
-		initialized = true;
-	}
-
-	void Hooks::frame_update() 
+	void Hooks::frame_update(void *memory) 
 	{
 		// Need to construct the current state
-		current_state.update();
+		current_state.update(memory);
 		// need to retain the action from the last step...
 		next_action = ai_engine.next_action(current_state, current_action);
 		// On every frame, we will do 

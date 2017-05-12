@@ -2101,14 +2101,7 @@ void CN64System::RefreshScreen()
 {
     PROFILE_TIMERS CPU_UsageAddr = Timer_None/*, ProfilingAddr = Timer_None*/;
     uint32_t VI_INTR_TIME = 500000;
-
-	{
-		void *buf;
-		ssbai::Hooks::initialize(&buf, (void**)&g_MMU);
-		ssbai::Hooks::frame_update();
-	}
-
-
+	
     if (bShowCPUPer()) { CPU_UsageAddr = m_CPU_Usage.StartTimer(Timer_RefreshScreen); }
 
     //Calculate how many cycles to next refresh
@@ -2198,7 +2191,9 @@ void CN64System::RefreshScreen()
         m_Cheats.ApplyCheats(g_MMU);
     }
     //    if (bProfiling)    { m_Profile.StartTimer(ProfilingAddr != Timer_None ? ProfilingAddr : Timer_R4300); }
-	ssbai::Hooks::frame_update();
+	{
+		ssbai::Hooks::frame_update(g_MMU);
+	}
 }
 
 void CN64System::TLB_Mapped(uint32_t VAddr, uint32_t Len, uint32_t PAddr, bool bReadOnly)

@@ -13,8 +13,7 @@ namespace ssbai
 	class Hooks
 	{
 	public:
-		static SSBAI_API void initialize(void**frame_buffer, void **mem_buffer);
-		static SSBAI_API void frame_update();
+		static SSBAI_API void frame_update(void *memory);
 	};
 
 
