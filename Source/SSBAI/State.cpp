@@ -24,9 +24,9 @@ void PlayerState::update_p2(uint8_t *offset)
 	uint8_t *damage_addr = offset + N64_DM_PLAYER2_DAMAGE;
 	uint8_t *location_x_addr = offset + N64_DM_PLAYER2_LOCATION_X;
 	uint8_t *location_y_addr = offset + N64_DM_PLAYER2_LOCATION_Y;
-	//location.update(GET_FLOAT(location_x_addr), GET_FLOAT(location_y_addr));
+	location.update(GET_FLOAT(location_x_addr), GET_FLOAT(location_y_addr));
 	damage = GET_UINT(damage_addr);
-	//life_loss = GET_UINT(life_loss_addr);
+	life_loss = GET_UINT(life_loss_addr);
 }
 
 State::~State()
