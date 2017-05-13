@@ -21,6 +21,7 @@ Action *AiEngine::next_action(State &state, Action &action)
 {
 	m_state = state;
 	m_current_action = action;
-	m_next_action.update();
+	//
+	//m_next_action.update();
 	return &m_next_action;
 }

@@ -16,8 +16,27 @@ namespace ssbai
 	Action *action;
 	unsigned long frame_counter = 0;
 
+	bool enabled_pressed = false;
+	bool m_engine_enabled = false;
+	bool engine_enabled(MYBUTTONS controller) {
+		
+		if (!enabled_pressed && controller.L_TRIG == 1) {
+			enabled_pressed = true;
+			m_engine_enabled = !m_engine_enabled;
+		}
+		if (enabled_pressed && controller.L_TRIG == 0) {
+			enabled_pressed = false;
+		}
+		return m_engine_enabled;	
+	}
+
 	void Hooks::frame_update(uint8_t *memory, uint32_t *controller1, uint32_t *controller2)
 	{
+		MYBUTTONS c2;
+		c2.Value = *controller2;
+		if (!engine_enabled(c2))
+			return;
+
 		if (frame_counter == 0) {
 			action = ai_engine.get_next_action();
 		}

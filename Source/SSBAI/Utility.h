@@ -30,6 +30,8 @@ private:
 public:
 	Vector2();
 	void update(float x, float y);
+	uint8_t discrete_x();
+	uint8_t discrete_y();
 };
 
 typedef union
