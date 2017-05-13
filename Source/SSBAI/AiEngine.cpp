@@ -12,8 +12,15 @@ AiEngine::~AiEngine()
 {
 }
 
-Action AiEngine::next_action(State & state, Action & action)
+Action * AiEngine::get_next_action()
 {
-	// TODO Actual AI step
-	return Action();
+	return &m_next_action;
+}
+
+Action *AiEngine::next_action(State &state, Action &action)
+{
+	m_state = state;
+	m_current_action = action;
+	m_next_action.update();
+	return &m_next_action;
 }

@@ -39,10 +39,12 @@ State::State() :
 {
 }
 
-void State::update(uint8_t *memory_offset)
+void State::update(uint8_t *memory_offset, uint32_t *enemy_inputs)
 {
 	my_state.update_p1(memory_offset);
 	enemy_state.update_p2(memory_offset);
+	enemy_buttons.Value = *enemy_inputs;
+
 }
 
 PlayerState::PlayerState()

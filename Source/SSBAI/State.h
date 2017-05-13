@@ -19,10 +19,11 @@ private:
 	PlayerState enemy_state;
 	// My data structures
 	PlayerState my_state;
+	MYBUTTONS enemy_buttons;
 
 public:
 	~State();
 	State();
-	void update(uint8_t *memory_offset);
+	void update(uint8_t * memory_offset, uint32_t * enemy_inputs);
 };
 

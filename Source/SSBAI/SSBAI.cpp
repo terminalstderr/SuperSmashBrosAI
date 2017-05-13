@@ -6,24 +6,38 @@
 #include "SSBAI.h"
 #include "AiEngine.h"
 
+#define SKIP_FRAME_MODULO 4
 
 namespace ssbai
 {
 	// Global SSBAI objects
 	AiEngine ai_engine;
 	State current_state;
-	Action current_action;
-	Action next_action;
-	bool initialized = false;
+	Action *action;
+	unsigned long frame_counter = 0;
 
 	void Hooks::frame_update(uint8_t *memory, uint32_t *controller1, uint32_t *controller2)
 	{
-		// Need to construct the current state
-		current_state.update(memory);
-		MYBUTTONS x;
-		x.Value = *controller1;
+		if (frame_counter == 0) {
+			action = ai_engine.get_next_action();
+		}
+		// Apply the action to the game
+		// We might want to enable next action every frame -- otherwise the controlls will be spastic
+		action->apply(controller1);
+
+		// We only want to update action every couple of frames, not every frame.
+		frame_counter++;
+		if (frame_counter % SKIP_FRAME_MODULO != 0)
+			return;
+
+		// Update the current state (just getting information from memory space of video game)
+		current_state.update(memory, controller2);
+
+		
 		// need to retain the action from the last step...
-		next_action = ai_engine.next_action(current_state, current_action);
+		action = ai_engine.next_action(current_state, *action);
+		
+
 		// On every frame, we will do 
 		// ai_engine.step()
 		// When training -- 

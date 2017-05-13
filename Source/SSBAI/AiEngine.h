@@ -1,20 +1,17 @@
 #pragma once
 #include "State.h"
-
-// Actions are essentially joystick movements and button presses
-class Action {};
-class Reward {};
-
+#include "Action.h"
 
 class AiEngine
 {
 private:
-	void *frame_buf;
-	void *mem_buf;
-	 
+	Action m_next_action;
+	Action m_current_action;
+	State m_state;
 public:
 	AiEngine();
 	~AiEngine();
-	Action next_action(State &state, Action &action);
+	Action *get_next_action();
+	Action *next_action(State &state, Action &action);
 };
 
