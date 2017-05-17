@@ -218,6 +218,14 @@ TSWLatexianTemp*
 
 # expex forward references with \gathertags
 *-tags.tex
+*.swp
+Debug/
+Release/
+Source/Project64/Glide64_SMASH_BROTHERS_01.png
+Source/Project64/Glide64_SMASH_BROTHERS_02.png
+Source/SSBAI/Release/
+Source/Source - Shortcut.lnk
+bin/
 
 *.aps
 *.ncb

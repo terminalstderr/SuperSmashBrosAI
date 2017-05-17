@@ -28,6 +28,8 @@
 #include <utime.h>
 #endif
 
+#include "SSBAI.h"
+
 #pragma warning(disable:4355) // Disable 'this' : used in base member initializer list
 
 CN64System::CN64System(CPlugins * Plugins, bool SavesReadOnly, bool SyncSystem) :
@@ -2094,11 +2096,12 @@ void CN64System::SyncToAudio()
     }
 }
 
+
 void CN64System::RefreshScreen()
 {
     PROFILE_TIMERS CPU_UsageAddr = Timer_None/*, ProfilingAddr = Timer_None*/;
     uint32_t VI_INTR_TIME = 500000;
-
+	
     if (bShowCPUPer()) { CPU_UsageAddr = m_CPU_Usage.StartTimer(Timer_RefreshScreen); }
 
     //Calculate how many cycles to next refresh
@@ -2119,6 +2122,10 @@ void CN64System::RefreshScreen()
     {
         g_Audio->SetViIntr(VI_INTR_TIME);
     }
+
+	uint8_t x = 4;
+	g_Plugins->Control()->ControllerCommand(0, &x);
+
     if (g_Plugins->Control()->GetKeys)
     {
         BUTTONS Keys;
@@ -2130,6 +2137,9 @@ void CN64System::RefreshScreen()
             m_Buttons[Control] = Keys.Value;
         }
     }
+
+	// Our Hook into Project64
+	ssbai::Hooks::frame_update(g_MMU->Rdram(), &(m_Buttons[0]), &(m_Buttons[1]));
 
     if (bShowCPUPer()) { m_CPU_Usage.StartTimer(Timer_UpdateScreen); }
 
@@ -2188,6 +2198,7 @@ void CN64System::RefreshScreen()
         m_Cheats.ApplyCheats(g_MMU);
     }
     //    if (bProfiling)    { m_Profile.StartTimer(ProfilingAddr != Timer_None ? ProfilingAddr : Timer_R4300); }
+
 }
 
 void CN64System::TLB_Mapped(uint32_t VAddr, uint32_t Len, uint32_t PAddr, bool bReadOnly)

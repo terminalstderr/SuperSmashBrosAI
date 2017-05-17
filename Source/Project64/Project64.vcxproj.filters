@@ -162,11 +162,11 @@
     <ClCompile Include="Settings\UISettings.cpp">
       <Filter>Source Files\Settings Files</Filter>
     </ClCompile>
-    <ClCompile Include="UserInterface\SupportWindow.cpp">
-      <Filter>Source Files\User Interface Source</Filter>
-    </ClCompile>
     <ClCompile Include="UserInterface\SupportEnterCode.cpp">
-      <Filter>Source Files\User Interface Source</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\SupportWindow.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,11 +299,11 @@
     <ClInclude Include="Settings\UISettings.h">
       <Filter>Header Files\Settings</Filter>
     </ClInclude>
-    <ClInclude Include="UserInterface\SupportWindow.h">
-      <Filter>Header Files\User Interface Headers</Filter>
-    </ClInclude>
     <ClInclude Include="UserInterface\SupportEnterCode.h">
-      <Filter>Header Files\User Interface Headers</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterface\SupportWindow.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
