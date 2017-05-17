@@ -5,7 +5,6 @@
 class AiEngine
 {
 private:
-	Action m_next_action;
 	Action m_current_action;
 	State m_state;
 public:
