@@ -83,12 +83,27 @@ A lot of RL assumes a fixed policy, e.g. we are just testing a policy in the pro
 Temporal Difference methods allow policy to change over time.
   Issues is that there might not be convergence onto a single policy.
  
-Summary of "Playing atari with Deep Reinforcement Learning"
+
+  \textit{Summary of "Playing atari with Deep Reinforcement Learning"}
 There are multiple applications of reinforcement learning to generate models and train them to play video games, such as Atari games. 
 In these models, reinforcement learning finds the actions with the best reward at each play. 
 This method is a widely used method in combination with deep neural networks to teach computers to play Atari video games.
+
+This paper demonstrates that a convolutional neural network can overcome these challenges to learn successful control policies from raw video data in complex RL environments.
+
+Seems like the convolution neural network aspect does not abstractly match our project very well -- it matches the atari project very well but not the n64 state-reading problem.
+The difference is that their project focuses on using raw inputs, our project has a feature extraction/preprocessing aspect associated to it.
+Convolution NN are essentially for image recognition problems.
+
+It is not at all yet clear how "Q-learning" and "stochastic gradient descent" are composed.
+The latter is back-propogation in a ANN, the former is a DP technique for constructing an optimal policy.
 [10]
 
+
+\textit{https://en.wikipedia.org/wiki/Convolutional_neural_network}
+A simple feed forward neural network.
+Connectivity pattern is inspired by animal's visual cortex (cool).
+This style of neural network seems specially built for projects where we are working on a visual input (i.e. a screen buffer).
 
 \textit{https://en.wikipedia.org/wiki/Temporal_difference_learning}
 
@@ -199,6 +214,10 @@ What if we encode just some of the history into our state, like when a particula
 To get closer to the markov property, it would be super duper helpful to have the state maintain "all recently received inputs."
 
 Section 3.6
+
+From this book we have gathered a reference for basis knowledge for all reinforcement learning methods.
+This book will be an invaluable reference for anyone implementaing RL.
+Notice however that this book covers techniques but not implementations -- at its core this is a book of the academia behind RL and less helpful toward building a RL ANN algorithm.
 
 
 \textit{https://arxiv.org/pdf/1507.04296.pdf}
