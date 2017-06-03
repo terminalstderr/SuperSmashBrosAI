@@ -1,6 +1,9 @@
 #pragma once
+#include <memory>
 #include "State.h"
 #include "Action.h"
+
+typedef std::shared_ptr<Experience> ExperienceSharedPtr;
 
 class Experience
 {
