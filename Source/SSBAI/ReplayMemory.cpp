@@ -26,3 +26,8 @@ ExperienceSharedPtr ReplayMemory::sampleExperience()
 		return memory[i];
 	}
 }
+
+void ReplayMemory::seed(unsigned n)
+{
+	rng.seed(n);
+}
