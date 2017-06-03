@@ -10,7 +10,6 @@ AiEngine::AiEngine()
 
 AiEngine::~AiEngine()
 {
-	// TODO: for item in weights vector, delete
 }
 
 void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
@@ -20,6 +19,24 @@ void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
 		NetworkLayer nl;
 		nl.init(hidden_layer_width, hidden_layer_width);
 		hidden_layers.push_back(nl);
+	}
+}
+
+void compute_output_layer(const NetworkLayer layer, const std::vector<float> *input_layer, std::vector<float> *output_layer)
+{
+	// for every perceptron in the layer
+	for (unsigned p = 0; p < layer.size(); ++p)
+	{
+		// compute the magnitude of this perceptron
+		std::vector<float>	*weights = layer.getPerceptronWeights(p);
+		const float			*bias = layer.getPerceptronBias(p);
+		float accumulator = 0.0;
+		for (unsigned i = 0; i < weights->size(); ++i)
+		{
+			accumulator += (*input_layer)[i] * (*weights)[i];
+		}
+		// threshold check
+		(*output_layer)[p] = accumulator > (*bias) ? 1.0 : 0.0;
 	}
 }
 
@@ -42,12 +59,17 @@ void NetworkLayer::init(unsigned layer_size, unsigned input_size)
 	weights.resize(layer_size, new std::vector<float>(input_size, 0.0));
 }
 
-std::vector<float>* NetworkLayer::getPerceptronWeights(unsigned i)
+std::vector<float>* NetworkLayer::getPerceptronWeights(unsigned i) const
 {
 	return weights[i];
 }
 
-float * NetworkLayer::getPerceptronBias(unsigned i)
+const float * NetworkLayer::getPerceptronBias(unsigned i) const
 {
 	return &(biases[i]);
+}
+
+unsigned NetworkLayer::size() const
+{
+	return biases.size();
 }

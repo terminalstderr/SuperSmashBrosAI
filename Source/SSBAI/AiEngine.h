@@ -10,9 +10,11 @@ struct NetworkLayer {
 	std::vector<std::vector<float>*> weights;
 	std::vector<float> biases;
 
+	// TODO -- destructor should free all memory allocated in the init call
 	void init(unsigned layer_size, unsigned input_size);
-	std::vector<float> *getPerceptronWeights(unsigned i);
-	float *getPerceptronBias(unsigned i);
+	std::vector<float> *getPerceptronWeights(unsigned i) const;
+	const float *getPerceptronBias(unsigned i) const;
+	unsigned size() const;
 };
 
 
