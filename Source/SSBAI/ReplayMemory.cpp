@@ -14,7 +14,15 @@ ReplayMemory::~ReplayMemory()
 
 ExperienceSharedPtr ReplayMemory::sampleExperience()
 {
-	std::uniform_int_distribution<unsigned> d(1,memory.size());
-	unsigned i = d(rng);
-	return memory[i];
+	if (memory.empty()) 
+	{
+		// TODO
+		return NULL;
+	}
+	else
+	{
+		std::uniform_int_distribution<unsigned> d(1, memory.size());
+		unsigned i = d(rng);
+		return memory[i];
+	}
 }
