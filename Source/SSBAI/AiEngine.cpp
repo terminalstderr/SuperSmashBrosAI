@@ -31,3 +31,13 @@ void NetworkLayer::init(unsigned layer_size, unsigned input_size)
 	biases.resize(layer_size, 0.0);
 	weights.resize(layer_size, new std::vector<float>(input_size, 0.0));
 }
+
+std::vector<float>* NetworkLayer::getPerceptronWeights(unsigned i)
+{
+	return weights[i];
+}
+
+float * NetworkLayer::getPerceptronBias(unsigned i)
+{
+	return &(biases[i]);
+}

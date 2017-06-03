@@ -9,8 +9,8 @@ struct NetworkLayer {
 	std::vector<float> biases;
 
 	void init(unsigned layer_size, unsigned input_size);
-	std::vector<float> *getWeights(unsigned i);
-	float *getBias(unsigned i);
+	std::vector<float> *getPerceptronWeights(unsigned i);
+	float *getPerceptronBias(unsigned i);
 };
 
 class AiEngine
