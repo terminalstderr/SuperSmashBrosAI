@@ -1,16 +1,17 @@
 #pragma once
+#include <vector>
 #include "State.h"
 #include "Action.h"
+#include "Experience.h"
 
 class AiEngine
 {
 private:
-	Action m_current_action;
-	State m_state;
+	std::vector<float> weights;
 public:
 	AiEngine();
 	~AiEngine();
-	Action *get_next_action();
-	Action *next_action(State &state, Action &action);
+	ActionSharedPtr predict(const StateSharedPtr state);
+	void adjustWeights(const ExperienceSharedPtr exp);
 };
 

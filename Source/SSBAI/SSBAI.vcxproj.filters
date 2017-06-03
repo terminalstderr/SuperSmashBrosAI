@@ -42,6 +42,9 @@
     <ClInclude Include="Experience.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReplayMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -66,6 +69,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Experience.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplayMemory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,5 +1,7 @@
 #pragma once
 #include "Utility.h"
+#include <memory>
+
 
 class PlayerState {
 	void *frame_buffer;
@@ -25,5 +27,8 @@ public:
 	~State();
 	State();
 	void update(uint8_t * memory_offset, uint32_t * enemy_inputs);
+	void copy(StateSharedPtr other);
+	float get_reward();
 };
 
+typedef std::shared_ptr<State> StateSharedPtr;

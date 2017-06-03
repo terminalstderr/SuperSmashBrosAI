@@ -150,6 +150,7 @@
     <ClInclude Include="Action.h" />
     <ClInclude Include="AiEngine.h" />
     <ClInclude Include="Experience.h" />
+    <ClInclude Include="ReplayMemory.h" />
     <ClInclude Include="SSBAI.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="stdafx.h" />
@@ -174,6 +175,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Experience.cpp" />
+    <ClCompile Include="ReplayMemory.cpp" />
     <ClCompile Include="SSBAI.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="stdafx.cpp">

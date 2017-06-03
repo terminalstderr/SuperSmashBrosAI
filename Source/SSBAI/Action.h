@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Utility.h"
-#include <random>
+#include <memory>
+
 
 class Action
 {
@@ -44,3 +45,4 @@ public:
 	void update();
 };
 
+typedef std::shared_ptr<Action> ActionSharedPtr;

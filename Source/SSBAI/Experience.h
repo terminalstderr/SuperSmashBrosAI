@@ -3,7 +3,6 @@
 #include "State.h"
 #include "Action.h"
 
-typedef std::shared_ptr<Experience> ExperienceSharedPtr;
 
 class Experience
 {
@@ -13,6 +12,8 @@ private:
 	double r;
 	State s2;
 public:
-	Experience(State &s, Action &a, double reward, State &s2);
+	Experience(StateSharedPtr s, ActionSharedPtr a, double reward, StateSharedPtr s2);
 };
+
+typedef std::shared_ptr<Experience> ExperienceSharedPtr;
 

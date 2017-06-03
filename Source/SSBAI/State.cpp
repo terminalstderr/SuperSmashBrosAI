@@ -47,6 +47,13 @@ void State::update(uint8_t *memory_offset, uint32_t *enemy_inputs)
 
 }
 
+void State::copy(StateSharedPtr other)
+{
+	this->my_state = other->my_state;
+	this->enemy_buttons = other->enemy_buttons;
+	this->enemy_state = other->enemy_state;
+}
+
 PlayerState::PlayerState()
 {
 }
