@@ -12,6 +12,11 @@ ReplayMemory::~ReplayMemory()
 {
 }
 
+void ReplayMemory::addExperience(ExperienceSharedPtr e)
+{
+	memory.push_back(e);
+}
+
 ExperienceSharedPtr ReplayMemory::sampleExperience()
 {
 	if (memory.empty()) 
