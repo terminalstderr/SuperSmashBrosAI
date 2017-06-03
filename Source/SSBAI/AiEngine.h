@@ -5,7 +5,7 @@
 #include "Experience.h"
 
 struct NetworkLayer {
-	std::vector<std::vector<float>> weights;
+	std::vector<std::vector<float>*> weights;
 	std::vector<float> biases;
 
 	void init(unsigned layer_size, unsigned input_size);

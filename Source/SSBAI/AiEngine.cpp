@@ -10,6 +10,7 @@ AiEngine::AiEngine()
 
 AiEngine::~AiEngine()
 {
+	// TODO: for item in weights vector, delete
 }
 
 ActionSharedPtr AiEngine::predict(const StateSharedPtr state)
@@ -23,4 +24,10 @@ ActionSharedPtr AiEngine::predict(const StateSharedPtr state)
 void AiEngine::adjustWeights(const ExperienceSharedPtr exp)
 {
 	// TODO
+}
+
+void NetworkLayer::init(unsigned layer_size, unsigned input_size)
+{
+	biases.resize(layer_size, 0.0);
+	weights.resize(layer_size, new std::vector<float>(input_size, 0.0));
 }
