@@ -11,6 +11,7 @@ private:
 public:
 	AiEngine();
 	~AiEngine();
+	void init(unsigned hidden_layer_count, unsigned hidden_layer_width);
 	ActionSharedPtr predict(const StateSharedPtr state);
 	void adjustWeights(const ExperienceSharedPtr exp);
 };

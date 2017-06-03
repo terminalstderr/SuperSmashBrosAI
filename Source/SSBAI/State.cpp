@@ -54,6 +54,12 @@ void State::copy(StateSharedPtr other)
 	this->enemy_state = other->enemy_state;
 }
 
+float State::get_reward()
+{
+	// Reward is 1/20th of the damage ratio plus the enemy life loss
+	return 0.05 * (enemy_state.damage_delta / my_state.damage_delta) + enemy_state.life_loss;
+}
+
 PlayerState::PlayerState()
 {
 }

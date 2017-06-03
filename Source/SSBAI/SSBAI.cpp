@@ -29,6 +29,48 @@ namespace ssbai
 		return m_engine_enabled;	
 	}
 
+	// We must hold onto 'last' state and 'current state'
+	// In each frame update, we have to get the environment reward and state. call these r1, s1.
+	// The last state we were in was s0, the last action we used was a0.
+	// Insert s0,a0,r1,s1 into replay memory
+	// Global SSBAI objects
+	AiEngine ai_engine;
+	ReplayMemory replay_memory;
+
+	// Below is our SARS (state, action, reward, state) set
+	StateSharedPtr state(new State);
+	ActionSharedPtr action(new Action);
+	float reward = 0.0;
+	StateSharedPtr last_state(new State);
+
+	void env_pre_update(uint8_t *mem_offset, uint32_t *enemy_inputs)
+	{
+		last_state->copy(state);
+		state->update(mem_offset, enemy_inputs);
+		reward = state->get_reward();
+	}
+
+	void ai_update()
+	{
+		// Add the replay memory now that we know how the last frame went
+		ExperienceSharedPtr e(new Experience(last_state, action, reward, state));
+		replay_memory.addExperience(e);
+
+		// Predict the next action!
+		action = ai_engine.predict(state);
+
+		// Teach the AI engine now
+		ai_engine.adjustWeights(e);
+		for (int i = 0; i<REPLAY_LEARN_COUNT; ++i) {
+			e = replay_memory.sampleExperience();
+			ai_engine.adjustWeights(e);
+		}
+	}
+
+	void env_post_update(uint32_t *my_inputs) {
+		action->apply(my_inputs);
+	}
+
 	// We only need to hold onto 'last' action. (i.e. just 'a')
 	//
 	// 
@@ -51,64 +93,11 @@ namespace ssbai
 		{
 			env_pre_update(memory, controller2);
 			ai_update();
-			env_post_update(controller1);
-
-			// Update the current state (just getting information from memory space of video game)
-			current_state.update(memory, controller2);
-
-			// need to retain the action from the last step...
-			action = ai_engine.predict(current_state, *action);
-
-			// On every frame, we will do 
-			// ai_engine.step()
-			// When training -- 
-			// 1. the step will perform a prediction based on the state
-			// 2. the step will perform an update based on 
-			// TODO: ai_engine.predict();
-			// TODO: ai_engine.update();
 		}
+		// The env_post_update is essentially just applying an action -- we do this regardless of AI_engine skipped frames
+		env_post_update(controller1);
 	}
 
-	// We must hold onto 'last' state and 'current state'
-	// In each frame update, we have to get the environment reward and state. call these r1, s1.
-	// The last state we were in was s0, the last action we used was a0.
-	// Insert s0,a0,r1,s1 into replay memory
-	// Global SSBAI objects
-	AiEngine ai_engine;
-	ReplayMemory replay_memory;
 
-	// Below is our SARS (state, action, reward, state) set
-	StateSharedPtr state(new State);
-	ActionSharedPtr action(new Action);
-	float reward = 0.0;
-	StateSharedPtr last_state(new State);
-	
-	void env_pre_update(uint8_t *mem_offset, uint32_t *enemy_inputs)
-	{
-		last_state->copy(state);
-		state->update(mem_offset, enemy_inputs);
-		reward = state->get_reward();
-	}
-
-	void ai_update() 
-	{
-		// Add the replay memory now that we know how the last frame went
-		ExperienceSharedPtr e(new Experience(last_state, action, reward, state));
-		replay_memory.addExperience(e);
-
-		// Predict the next action!
-		action = ai_engine.predict(state);
-
-		// Teach the AI engine now
-		ai_engine.adjustWeights(e);
-		for (int i = 0; i<REPLAY_LEARN_COUNT; ++i) {
-			e = replay_memory.sampleExperience();
-			ai_engine.adjustWeights(e);
-		}
-	}
-
-	void env_post_update(uint32_t *my_inputs) {
-		action->apply(my_inputs);
-	}
 }
 

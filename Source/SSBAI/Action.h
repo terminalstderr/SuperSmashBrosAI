@@ -3,6 +3,8 @@
 #include "Utility.h"
 #include <memory>
 
+class Action;
+typedef std::shared_ptr<Action> ActionSharedPtr;
 
 class Action
 {
@@ -44,5 +46,3 @@ public:
 
 	void update();
 };
-
-typedef std::shared_ptr<Action> ActionSharedPtr;

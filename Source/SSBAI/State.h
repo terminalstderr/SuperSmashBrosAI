@@ -2,14 +2,16 @@
 #include "Utility.h"
 #include <memory>
 
+class State;
+typedef std::shared_ptr<State> StateSharedPtr;
 
 class PlayerState {
-	void *frame_buffer;
+public:
 	unsigned damage;
+	unsigned damage_delta;
 	unsigned life_loss;
 	Vector2 location;
 
-public:
 	PlayerState();
 	void update_p1(uint8_t *memory_offset);
 	void update_p2(uint8_t *memory_offset);
@@ -30,5 +32,3 @@ public:
 	void copy(StateSharedPtr other);
 	float get_reward();
 };
-
-typedef std::shared_ptr<State> StateSharedPtr;
