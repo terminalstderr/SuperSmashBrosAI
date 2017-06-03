@@ -13,6 +13,16 @@ AiEngine::~AiEngine()
 	// TODO: for item in weights vector, delete
 }
 
+void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
+{
+	output_layer.init(POSSIBLE_ACTION_COUNT, hidden_layer_width);
+	for (unsigned i = 0; i < hidden_layer_count; i++) {
+		NetworkLayer nl;
+		nl.init(hidden_layer_width, hidden_layer_width);
+		hidden_layers.push_back(nl);
+	}
+}
+
 ActionSharedPtr AiEngine::predict(const StateSharedPtr state)
 {
 	// TODO

@@ -4,6 +4,8 @@
 #include "Action.h"
 #include "Experience.h"
 
+#define POSSIBLE_ACTION_COUNT 3
+
 struct NetworkLayer {
 	std::vector<std::vector<float>*> weights;
 	std::vector<float> biases;
@@ -13,10 +15,14 @@ struct NetworkLayer {
 	float *getPerceptronBias(unsigned i);
 };
 
+
 class AiEngine
 {
 private:
-	std::vector<std::vector<float>> hidden_layer_weights;
+	// The input layer will actually just be a preprocessing stage. The first real network layer will be the first hidden layer.
+	NetworkLayer output_layer;
+	std::vector<NetworkLayer> hidden_layers;
+
 public:
 	AiEngine();
 	~AiEngine();
