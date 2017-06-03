@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="Action.h" />
     <ClInclude Include="AiEngine.h" />
+    <ClInclude Include="Experience.h" />
     <ClInclude Include="SSBAI.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="stdafx.h" />
@@ -172,6 +173,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Experience.cpp" />
     <ClCompile Include="SSBAI.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="stdafx.cpp">

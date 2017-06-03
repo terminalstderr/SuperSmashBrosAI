@@ -22,6 +22,9 @@
 
 #define GET_FLOAT(x) *((float*)x)
 #define GET_UINT(x) *((unsigned*)x)
+class State;
+class Action;
+
 
 class Vector2 {
 private:

@@ -23,3 +23,5 @@ uint8_t Vector2::discrete_y()
 {
 	return static_cast<uint8_t> (this->y * 255);
 }
+
+
