@@ -110,20 +110,34 @@ std::shared_ptr<std::vector<float>> State::get_locations()
 
 std::shared_ptr<std::vector<float>> State::get_velocities()
 {
-	// TODO
-	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	std::shared_ptr<std::vector<float>> ret = std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	// TODO We may want to do a 'min-clamp' to ensure it doesn't go over 1.0 (this metric and Acceleration will be particularly prone to large spikes!)
+	ret->push_back((enemy_state.velocity.x + MAX_VELOCITY) / (2 * MAX_VELOCITY));
+	ret->push_back((enemy_state.velocity.y + MAX_VELOCITY) / (2 * MAX_VELOCITY));
+	ret->push_back((my_state.velocity.x + MAX_VELOCITY) / (2 * MAX_VELOCITY));
+	ret->push_back((my_state.velocity.y + MAX_VELOCITY) / (2 * MAX_VELOCITY));
+	return ret;
 }
 
 std::shared_ptr<std::vector<float>> State::get_accelerations()
 {
-	// TODO
-	return std::shared_ptr<std::vector<float>>();
+	std::shared_ptr<std::vector<float>> ret = std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	// TODO We may want to do a 'min-clamp' to ensure it doesn't go over 1.0 (this metric and Velocity will be particularly prone to large spikes!)
+	ret->push_back((enemy_state.acceleration.x + MAX_ACCELERATION) / (2 * MAX_ACCELERATION));
+	ret->push_back((enemy_state.acceleration.y + MAX_ACCELERATION) / (2 * MAX_ACCELERATION));
+	ret->push_back((my_state.acceleration.x + MAX_ACCELERATION) / (2 * MAX_ACCELERATION));
+	ret->push_back((my_state.acceleration.y + MAX_ACCELERATION) / (2 * MAX_ACCELERATION));
+	return ret;
 }
 
 std::shared_ptr<std::vector<float>> State::get_player_distance()
 {
-	// TODO
-	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	std::shared_ptr<std::vector<float>> ret = std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	// See note about doing a 'min clamp' in get_locations()
+	Vector2 distance = enemy_state.location - my_state.location;
+	ret->push_back((distance.x + MAX_LOCATION_RADIUS_X) / (2*MAX_LOCATION_RADIUS_X));
+	ret->push_back((distance.y + MAX_LOCATION_RADIUS_Y) / (2*MAX_LOCATION_RADIUS_Y));
+	return ret;
 }
 
 std::shared_ptr<std::vector<float>> State::get_damages()

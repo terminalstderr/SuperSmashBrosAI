@@ -26,6 +26,10 @@
 #define MAX_LOCATION_RADIUS_X 14500
 #define MAX_LOCATION_RADIUS_Y 11000
 
+// MAX Velocity and Acceleration approximated when DK got hit by a lazer while at %200 health (could definitely be higher than this number for a true max)
+#define MAX_VELOCITY 10000
+#define MAX_ACCELERATION 300000
+
 #define GET_FLOAT(x) *((float*)x)
 #define GET_UINT(x) *((unsigned*)x)
 class State;
