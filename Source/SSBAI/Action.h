@@ -38,6 +38,7 @@ public:
 	// Jump
 	// Sheild
 	void Attack();
+	void Special();
 	void Move(Vector2 direction);
 	void Jump();
 	void Shield();

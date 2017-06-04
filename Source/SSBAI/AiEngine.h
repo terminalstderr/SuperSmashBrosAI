@@ -4,7 +4,14 @@
 #include "Action.h"
 #include "Experience.h"
 
-#define POSSIBLE_ACTION_COUNT 3
+#define POSSIBLE_ACTION_COUNT 7
+#define OUT_LEFT_RIGHT 0
+#define OUT_UP_DOWN 1
+#define OUT_SPEED 2
+#define OUT_SHIELD 3
+#define OUT_ATTACK 4
+#define OUT_SPECIAL 5
+#define OUT_JUMP 6
 
 struct NetworkLayer {
 	std::vector<std::vector<float>*> weights;

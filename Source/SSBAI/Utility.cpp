@@ -34,12 +34,12 @@ Vector2 Vector2::operator/(const double rhs)
 // Assumes that the vector is normalized
 uint8_t Vector2::discrete_x()
 {
-	return static_cast<uint8_t> (this->x * 255);
+	return static_cast<uint8_t> (this->x * 127);
 }
 
 uint8_t Vector2::discrete_y()
 {
-	return static_cast<uint8_t> (this->y * 255);
+	return static_cast<uint8_t> (this->y * 127);
 }
 
 void clamp(std::shared_ptr<std::vector<float>> a, float min_clamp, float max_clamp)

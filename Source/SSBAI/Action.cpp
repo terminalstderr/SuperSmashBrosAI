@@ -24,6 +24,11 @@ void Action::Attack()
 	buttons.A_BUTTON = 1;
 }
 
+void Action::Special()
+{
+	buttons.B_BUTTON = 1;
+}
+
 void Action::Move(Vector2 direction)
 {
 	buttons.X_AXIS = direction.discrete_x();

@@ -31,7 +31,6 @@ void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
 }
 
 // TODO: The outer for loop can be parallelized.
-// TODO: why are we passing a copy of NetworkLayer instead of a pointer to it???
 void AiEngine::compute_output_layer(const NetworkLayer &layer, const std::vector<float> *input_layer, std::vector<float> *output_layer)
 {
 	// for every perceptron in the layer
@@ -53,8 +52,26 @@ void AiEngine::compute_output_layer(const NetworkLayer &layer, const std::vector
 ActionSharedPtr AiEngine::get_action(std::vector<float> network_outputs)
 {
 	ActionSharedPtr action = ActionSharedPtr(new Action());
-	// TODO
-	action->Attack();
+	// First 3 outputs dictate how the AI moves
+	float lr = network_outputs[OUT_LEFT_RIGHT];
+	float ud = network_outputs[OUT_UP_DOWN];
+	float s = network_outputs[OUT_SPEED];
+	float x = (lr == 0.0 ? -1.0f : 1.0f) * (s == 0.0 ? 0.5 : 1.0f);
+	float y = (lr == 0.0 ? -1.0f : 1.0f) * (s == 0.0 ? 0.5 : 1.0f);
+	Vector2 movement;
+	movement.update(x, y);
+	action->Move(movement);
+
+	// Next 4 outputs dictates whether AI does Sheild, Attack, Special, Jump
+	if (network_outputs[OUT_ATTACK] == 1.0)
+		action->Attack();
+	if (network_outputs[OUT_SHIELD] == 1.0)
+		action->Shield();
+	if (network_outputs[OUT_JUMP] == 1.0)
+		action->Jump();
+	if (network_outputs[OUT_SPECIAL] == 1.0)
+		action->Special();
+
 	return action;
 }
 
