@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 #include <iostream>
+#include <iomanip>
+#include <fstream>
 #include "SSBAI.h"
 #include "AiEngine.h"
 #include "ReplayMemory.h"
@@ -53,19 +55,26 @@ namespace ssbai
 
 	void ai_update()
 	{
+		double start, elapsed;
 		// Add the replay memory now that we know how the last frame went
 		ExperienceSharedPtr e(new Experience(last_state, action, reward, state));
 		replay_memory.addExperience(e);
 
 		// Predict the next action!
+		start = omp_get_wtime();
 		action = ai_engine.predict(state);
+		elapsed = omp_get_wtime() - start;
+		logger() << "Forward Propogation:  " << std::fixed << std::setprecision(3) <<  elapsed << std::endl;
 
 		// Teach the AI engine now
+		start = omp_get_wtime();
 		ai_engine.adjustWeights(e);
 		for (int i = 0; i<REPLAY_LEARN_COUNT; ++i) {
 			e = replay_memory.sampleExperience();
 			ai_engine.adjustWeights(e);
 		}
+		elapsed = omp_get_wtime() - start;
+		logger() << "Backward Propogation: " << std::fixed << std::setprecision(3) << elapsed << std::endl;
 	}
 
 	void env_post_update(uint32_t *my_inputs) {
@@ -73,7 +82,8 @@ namespace ssbai
 	}
 
 	void init() {
-		ai_engine.init(1, 128);
+		logger() << "Initializing new engine!" << std::endl;
+		ai_engine.init(1, 24);
 		ai_engine.rand();
 	}
 

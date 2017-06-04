@@ -100,6 +100,7 @@ std::shared_ptr<std::vector<float>> AiEngine::get_input_layer(StateSharedPtr sta
 	ret->insert(ret->end(), tmp->begin(), tmp->end());
 	clamp(ret, 0.0, 1.0);
 	// XXX We need to make sure that the input layer is at least the size of the first hidden network layer
+	// XXX TODO XXX TODO XXX This is broken
 	ret->resize(this->hidden_layer_width, 0.0);
 	return ret;
 }
@@ -133,7 +134,10 @@ void AiEngine::adjustWeights(const ExperienceSharedPtr exp)
 void NetworkLayer::init(unsigned layer_size, unsigned input_size)
 {
 	biases.resize(layer_size, 0.0);
-	weights.resize(layer_size, new std::vector<float>(input_size, 0.0));
+	for (unsigned i = 0; i < input_size; ++i)
+	{
+		weights.push_back(new std::vector<float>(input_size, 0.0));
+	}
 }
 
 void NetworkLayer::rand()
@@ -156,8 +160,8 @@ void NetworkLayer::rand()
 	}
 	for (unsigned i = 0; i < this->biases.size(); ++i)
 	{
-		// Bias starts pretty high -- to ensure that essentially we should get random behavior of the gitgo
-		this->biases[i] = this->input_size() * scale * uniform_random(1, this->input_size());
+		// Bias starts in the realm of "3 active inputs" -- seems like a good bias
+		this->biases[i] = 8 * scale * uniform_random(1, this->input_size());
 	}
 }
 

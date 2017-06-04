@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <fstream>
+
 #include "State.h"
 #include "Action.h"
 #include "Experience.h"

@@ -89,3 +89,5 @@ void seed_uniform_random();
 
 // This is inclusive, both lower and upper can show up in the results!
 unsigned uniform_random(unsigned lower, unsigned upper);
+
+std::ofstream logger();
