@@ -31,7 +31,7 @@ private:
 	unsigned hidden_layer_width;
 
 	std::shared_ptr<std::vector<float>> get_input_layer(StateSharedPtr state);
-	void compute_output_layer(const NetworkLayer layer, const std::vector<float> *input_layer, std::vector<float> *output_layer);
+	void compute_output_layer(const NetworkLayer &layer, const std::vector<float> *input_layer, std::vector<float> *output_layer);
 	ActionSharedPtr get_action(std::vector<float> network_outputs);
 
 

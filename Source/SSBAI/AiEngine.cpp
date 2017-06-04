@@ -32,7 +32,7 @@ void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
 
 // TODO: The outer for loop can be parallelized.
 // TODO: why are we passing a copy of NetworkLayer instead of a pointer to it???
-void AiEngine::compute_output_layer(const NetworkLayer layer, const std::vector<float> *input_layer, std::vector<float> *output_layer)
+void AiEngine::compute_output_layer(const NetworkLayer &layer, const std::vector<float> *input_layer, std::vector<float> *output_layer)
 {
 	// for every perceptron in the layer
 	for (unsigned p = 0; p < layer.size(); ++p)
