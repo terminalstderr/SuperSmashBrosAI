@@ -68,6 +68,6 @@ unsigned uniform_random(unsigned lower, unsigned upper)
 std::ofstream logger()
 {
 	std::ofstream logfile;
-	logfile.open("C:/Users/Ryan/repos/project64/bin/Debug/log.txt", std::ios_base::app);
+	logfile.open("C:/Users/Ryan/repos/project64/log.txt", std::ios_base::app);
 	return logfile;
 }
