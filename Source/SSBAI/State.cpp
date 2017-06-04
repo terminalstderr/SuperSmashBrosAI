@@ -2,6 +2,7 @@
 #include "State.h"
 #include "Utility.h"
 #include <algorithm>
+#include <omp.h>
 
 
 void PlayerState::update_p1(uint8_t *offset)
@@ -42,10 +43,12 @@ State::State() :
 
 void State::update(uint8_t *memory_offset, uint32_t *enemy_inputs)
 {
+	double this_frame_time = omp_get_wtime();;
+	double delta = this_frame_time - last_frame_time;
 	my_state.update_p1(memory_offset);
 	enemy_state.update_p2(memory_offset);
 	enemy_buttons.Value = *enemy_inputs;
-
+	last_frame_time = this_frame_time;
 }
 
 void State::copy(StateSharedPtr other)
@@ -61,32 +64,6 @@ float State::get_reward()
 	return 0.05 * (enemy_state.damage_delta / my_state.damage_delta) + enemy_state.life_loss;
 }
 
-/*
-unsigned R_DPAD : 1;
-unsigned L_DPAD : 1;
-unsigned D_DPAD : 1;
-unsigned U_DPAD : 1;
-
-unsigned START_BUTTON : 1;
-
-unsigned Z_TRIG : 1;
-unsigned B_BUTTON : 1;
-unsigned A_BUTTON : 1;
-unsigned R_CBUTTON : 1;
-unsigned L_CBUTTON : 1;
-unsigned D_CBUTTON : 1;
-unsigned U_CBUTTON : 1;
-unsigned R_TRIG : 1;
-unsigned L_TRIG : 1;
-
-unsigned Reserved1 : 1;
-unsigned Reserved2 : 1;
-
-signed   Y_AXIS : 8;
-
-signed   X_AXIS : 8;
-
-*/
 std::shared_ptr<std::vector<float>> State::get_buttons()
 {
 	std::shared_ptr<std::vector<float>> ret = std::shared_ptr<std::vector<float>>(new std::vector<float>());

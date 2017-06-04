@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include <memory>
 #include <vector>
+#include <omp.h>
 
 class State;
 typedef std::shared_ptr<State> StateSharedPtr;
@@ -25,6 +26,7 @@ private:
 	// My data structures
 	PlayerState my_state;
 	MYBUTTONS enemy_buttons;
+	double last_frame_time = omp_get_wtime();;
 
 public:
 	~State();
