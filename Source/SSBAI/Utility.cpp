@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <algorithm>
+#include <random>
 
 
 Vector2::Vector2()
@@ -47,4 +48,18 @@ void clamp(std::shared_ptr<std::vector<float>> a, float min_clamp, float max_cla
 	for (std::vector<float>::iterator val = a->begin(); val != a->end(); ++val) {
 		*val = (std::max)(min_clamp, (std::min)(*val, max_clamp));
 	}
+}
+
+std::mt19937_64 rng;
+
+void seed_uniform_random()
+{
+	rng.seed(rng.default_seed);
+}
+
+// This is inclusive, both lower and upper can show up in the results!
+unsigned uniform_random(unsigned lower, unsigned upper)
+{
+	std::uniform_int_distribution<unsigned> d(lower, upper);
+	return d(rng);
 }

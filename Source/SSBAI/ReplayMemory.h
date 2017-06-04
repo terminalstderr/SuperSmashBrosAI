@@ -20,5 +20,4 @@ public:
 	Gets a random experience from the replay memory.
 	*/
 	ExperienceSharedPtr sampleExperience();
-	void seed(unsigned n);
 };

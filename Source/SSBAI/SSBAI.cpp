@@ -74,6 +74,7 @@ namespace ssbai
 
 	void init() {
 		ai_engine.init(1, 128);
+		ai_engine.rand();
 	}
 
 	// We only need to hold onto 'last' action. (i.e. just 'a')

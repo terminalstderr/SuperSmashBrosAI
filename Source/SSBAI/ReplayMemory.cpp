@@ -4,7 +4,6 @@
 
 ReplayMemory::ReplayMemory()
 {
-	rng.seed(rng.default_seed);
 }
 
 
@@ -26,13 +25,7 @@ ExperienceSharedPtr ReplayMemory::sampleExperience()
 	}
 	else
 	{
-		std::uniform_int_distribution<unsigned> d(1, memory.size());
-		unsigned i = d(rng);
+		unsigned i = uniform_random(1, memory.size());
 		return memory[i-1];
 	}
-}
-
-void ReplayMemory::seed(unsigned n)
-{
-	rng.seed(n);
 }

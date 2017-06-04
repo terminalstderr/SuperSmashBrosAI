@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <random>
 
 // Camera Datastructure -- if we set the value to around 10000.00 it will be pretty far away
 //#define N64_DM_CAMERA_ZOOM			0x339d08ac//0x3c4214ac
@@ -82,3 +83,9 @@ typedef union
 		signed   X_AXIS : 8;
 	};
 } MYBUTTONS;
+
+
+void seed_uniform_random();
+
+// This is inclusive, both lower and upper can show up in the results!
+unsigned uniform_random(unsigned lower, unsigned upper);

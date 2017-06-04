@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AiEngine.h"
 #include "Utility.h"
+#include <random>
 
 
 AiEngine::AiEngine()
@@ -28,6 +29,16 @@ void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
 	// Setup the meta variables for this data structure
 	this->hidden_layer_count = hidden_layer_count;
 	this->hidden_layer_width = hidden_layer_width;
+}
+
+void AiEngine::rand()
+{
+	// Handle output layer perceptrons (Network Layer) and output vector
+	output_layer.rand();
+	// Handle hidden layers' perceptrons (Network Layers) and output vectors
+	for (unsigned i = 0; i < hidden_layer_count; i++) {
+		hidden_layers[i].rand();
+	}
 }
 
 // TODO: The outer for loop can be parallelized.
@@ -125,6 +136,31 @@ void NetworkLayer::init(unsigned layer_size, unsigned input_size)
 	weights.resize(layer_size, new std::vector<float>(input_size, 0.0));
 }
 
+void NetworkLayer::rand()
+{
+	// "recommend scaling by the inverse of the square root of the fan-in"
+	// https://stats.stackexchange.com/a/186351
+	// https://arxiv.org/abs/1206.5533
+
+	//initialization w = U([0,n]) * sqrt(2.0/n) where n is the number of inputs of your NN.
+	// https://stats.stackexchange.com/a/248040
+	// https://arxiv.org/abs/1502.01852
+
+	float scale = sqrt(2.0 / this->input_size());
+	for (auto perceptron_weights : this->weights)
+	{
+		for (auto weight = perceptron_weights->begin(); weight != perceptron_weights->end(); weight++)
+		{
+			(*weight) = scale * uniform_random(1, this->input_size());
+		}
+	}
+	for (unsigned i = 0; i < this->biases.size(); ++i)
+	{
+		// Bias starts pretty high -- to ensure that essentially we should get random behavior of the gitgo
+		this->biases[i] = this->input_size() * scale * uniform_random(1, this->input_size());
+	}
+}
+
 std::vector<float>* NetworkLayer::getPerceptronWeights(unsigned i) const
 {
 	return weights[i];
@@ -138,4 +174,9 @@ const float * NetworkLayer::getPerceptronBias(unsigned i) const
 unsigned NetworkLayer::size() const
 {
 	return biases.size();
+}
+
+unsigned NetworkLayer::input_size() const
+{
+	return weights[0]->size();
 }

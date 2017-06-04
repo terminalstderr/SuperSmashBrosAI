@@ -20,9 +20,11 @@ struct NetworkLayer {
 
 	// TODO -- destructor should free all memory allocated in the init call
 	void init(unsigned layer_size, unsigned input_size);
+	void rand();
 	std::vector<float> *getPerceptronWeights(unsigned i) const;
 	const float *getPerceptronBias(unsigned i) const;
 	unsigned size() const;
+	unsigned input_size() const;
 };
 
 
@@ -46,6 +48,7 @@ public:
 	AiEngine();
 	~AiEngine();
 	void init(unsigned hidden_layer_count, unsigned hidden_layer_width);
+	void rand();
 	ActionSharedPtr predict(const StateSharedPtr state);
 	void adjustWeights(const ExperienceSharedPtr exp);
 };
