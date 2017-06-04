@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "State.h"
 #include "Utility.h"
+#include <algorithm>
 
 
 void PlayerState::update_p1(uint8_t *offset)
@@ -60,10 +61,51 @@ float State::get_reward()
 	return 0.05 * (enemy_state.damage_delta / my_state.damage_delta) + enemy_state.life_loss;
 }
 
+/*
+unsigned R_DPAD : 1;
+unsigned L_DPAD : 1;
+unsigned D_DPAD : 1;
+unsigned U_DPAD : 1;
+
+unsigned START_BUTTON : 1;
+
+unsigned Z_TRIG : 1;
+unsigned B_BUTTON : 1;
+unsigned A_BUTTON : 1;
+unsigned R_CBUTTON : 1;
+unsigned L_CBUTTON : 1;
+unsigned D_CBUTTON : 1;
+unsigned U_CBUTTON : 1;
+unsigned R_TRIG : 1;
+unsigned L_TRIG : 1;
+
+unsigned Reserved1 : 1;
+unsigned Reserved2 : 1;
+
+signed   Y_AXIS : 8;
+
+signed   X_AXIS : 8;
+
+*/
 std::shared_ptr<std::vector<float>> State::get_buttons()
 {
-	// TODO
-	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	std::shared_ptr<std::vector<float>> ret = std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	
+	// For simple buttons, we simple cast them to float (they will be either 0.0 or 1.0)
+	ret->push_back(static_cast<float>(enemy_buttons.A_BUTTON));
+	ret->push_back(static_cast<float>(enemy_buttons.B_BUTTON));
+	ret->push_back(static_cast<float>(enemy_buttons.Z_TRIG));
+	ret->push_back(static_cast<float>(enemy_buttons.R_TRIG));
+	ret->push_back(static_cast<float>(enemy_buttons.L_TRIG));
+	
+	// For 'or' over buttons, we get the max of "all of the buttons summed" against "1.0"
+	// Notice: Usage of extra paranthesis in (std::max) to ensure it does not get expanded to the macro defined in windows.h
+	ret->push_back((std::min)(static_cast<float>(enemy_buttons.D_CBUTTON + enemy_buttons.L_CBUTTON + enemy_buttons.R_CBUTTON + enemy_buttons.U_CBUTTON), 1.0f));
+	
+	// For analog-stick, we normalize from the range of -128, 128 -> 0.0, 1.0
+	ret->push_back((enemy_buttons.X_AXIS + 128) / 256.0f);
+	ret->push_back((enemy_buttons.Y_AXIS + 128) / 256.0f);
+	return ret;
 }
 
 std::shared_ptr<std::vector<float>> State::get_locations()
