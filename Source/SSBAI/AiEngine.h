@@ -27,6 +27,12 @@ private:
 	std::vector<float> output_layer_outputs;
 	std::vector<NetworkLayer> hidden_layers;
 	std::vector<std::vector<float>*> hidden_layer_outputs;
+	unsigned hidden_layer_count;
+	unsigned hidden_layer_width;
+
+	std::shared_ptr<std::vector<float>> get_input_layer(StateSharedPtr state);
+	void compute_output_layer(const NetworkLayer layer, const std::vector<float> *input_layer, std::vector<float> *output_layer);
+	ActionSharedPtr get_action(std::vector<float> network_outputs);
 
 
 public:

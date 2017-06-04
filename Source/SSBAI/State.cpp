@@ -60,6 +60,30 @@ float State::get_reward()
 	return 0.05 * (enemy_state.damage_delta / my_state.damage_delta) + enemy_state.life_loss;
 }
 
+std::shared_ptr<std::vector<float>> State::get_buttons()
+{
+	// TODO
+	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+}
+
+std::shared_ptr<std::vector<float>> State::get_locations()
+{
+	// TODO
+	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+}
+
+std::shared_ptr<std::vector<float>> State::get_velocities()
+{
+	// TODO
+	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+}
+
+std::shared_ptr<std::vector<float>> State::get_player_distance()
+{
+	// TODO
+	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+}
+
 PlayerState::PlayerState()
 {
 }

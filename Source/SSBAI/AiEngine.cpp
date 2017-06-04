@@ -25,9 +25,14 @@ void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
 		std::vector<float> *hlo = new std::vector<float>(hidden_layer_width, 0.0);
 		hidden_layer_outputs.push_back(hlo);
 	}
+	// Setup the meta variables for this data structure
+	this->hidden_layer_count = hidden_layer_count;
+	this->hidden_layer_width = hidden_layer_width;
 }
 
-void compute_output_layer(const NetworkLayer layer, const std::vector<float> *input_layer, std::vector<float> *output_layer)
+// TODO: The outer for loop can be parallelized.
+// TODO: why are we passing a copy of NetworkLayer instead of a pointer to it???
+void AiEngine::compute_output_layer(const NetworkLayer layer, const std::vector<float> *input_layer, std::vector<float> *output_layer)
 {
 	// for every perceptron in the layer
 	for (unsigned p = 0; p < layer.size(); ++p)
@@ -36,7 +41,7 @@ void compute_output_layer(const NetworkLayer layer, const std::vector<float> *in
 		std::vector<float>	*weights = layer.getPerceptronWeights(p);
 		const float			*bias = layer.getPerceptronBias(p);
 		float accumulator = 0.0;
-		for (unsigned i = 0; i < weights->size(); ++i)
+		for (unsigned i = 0; i < this->hidden_layer_width; ++i)
 		{
 			accumulator += (*input_layer)[i] * (*weights)[i];
 		}
@@ -45,13 +50,45 @@ void compute_output_layer(const NetworkLayer layer, const std::vector<float> *in
 	}
 }
 
+ActionSharedPtr AiEngine::get_action(std::vector<float> network_outputs)
+{
+	ActionSharedPtr action = ActionSharedPtr(new Action());
+	// TODO
+	action->Attack();
+	return action;
+}
+
+std::shared_ptr<std::vector<float>> AiEngine::get_input_layer(StateSharedPtr state) {
+	std::shared_ptr<std::vector<float>> ret = state->get_buttons();
+	std::shared_ptr<std::vector<float>> tmp = state->get_locations();
+	ret->insert(ret->end(), tmp->begin(), tmp->end());
+	tmp = state->get_velocities();
+	ret->insert(ret->end(), tmp->begin(), tmp->end());
+	tmp = state->get_player_distance();
+	ret->insert(ret->end(), tmp->begin(), tmp->end());
+	// XXX We need to make sure that the input layer is at least the size of the first hidden network layer
+	ret->resize(this->hidden_layer_width, 0.0);
+	return ret;
+}
+
 ActionSharedPtr AiEngine::predict(const StateSharedPtr state)
 {
-	// Need to generalize this to be all hidden layers:
-	compute_output_layer();
-	// TODO
-	ActionSharedPtr a = ActionSharedPtr(new Action());
-	a->Attack();
+	// Generate input layer from state
+	std::shared_ptr<std::vector<float>> input_layer = get_input_layer(state);
+
+	// With our pump primed with 'hli', we now compute all of the hidden_layer_outputs
+	std::vector<float> *hli = input_layer.get();
+	for (int i = 0; i < this->hidden_layer_count; ++i)
+	{
+		compute_output_layer(this->hidden_layers[i], hli, this->hidden_layer_outputs[i]);
+		hli = this->hidden_layer_outputs[i];
+	}
+
+	// Now we finally run our output layer 
+	compute_output_layer(output_layer, this->hidden_layer_outputs[this->hidden_layer_count], &output_layer_outputs);
+
+	// Generate the action from the final output layer
+	ActionSharedPtr a = get_action(output_layer_outputs);
 	return a;
 }
 
