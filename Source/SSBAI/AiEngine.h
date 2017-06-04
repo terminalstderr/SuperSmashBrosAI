@@ -10,6 +10,7 @@ struct NetworkLayer {
 	std::vector<std::vector<float>*> weights;
 	std::vector<float> biases;
 
+
 	// TODO -- destructor should free all memory allocated in the init call
 	void init(unsigned layer_size, unsigned input_size);
 	std::vector<float> *getPerceptronWeights(unsigned i) const;
@@ -23,7 +24,10 @@ class AiEngine
 private:
 	// The input layer will actually just be a preprocessing stage. The first real network layer will be the first hidden layer.
 	NetworkLayer output_layer;
+	std::vector<float> output_layer_outputs;
 	std::vector<NetworkLayer> hidden_layers;
+	std::vector<std::vector<float>*> hidden_layer_outputs;
+
 
 public:
 	AiEngine();

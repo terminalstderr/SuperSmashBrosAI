@@ -14,11 +14,16 @@ AiEngine::~AiEngine()
 
 void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
 {
+	// Handle output layer perceptrons (Network Layer) and output vector
 	output_layer.init(POSSIBLE_ACTION_COUNT, hidden_layer_width);
+	output_layer_outputs.resize(POSSIBLE_ACTION_COUNT, 0.0);
+	// Handle hidden layers' perceptrons (Network Layers) and output vectors
 	for (unsigned i = 0; i < hidden_layer_count; i++) {
 		NetworkLayer nl;
 		nl.init(hidden_layer_width, hidden_layer_width);
 		hidden_layers.push_back(nl);
+		std::vector<float> *hlo = new std::vector<float>(hidden_layer_width, 0.0);
+		hidden_layer_outputs.push_back(hlo);
 	}
 }
 
@@ -42,6 +47,8 @@ void compute_output_layer(const NetworkLayer layer, const std::vector<float> *in
 
 ActionSharedPtr AiEngine::predict(const StateSharedPtr state)
 {
+	// Need to generalize this to be all hidden layers:
+	compute_output_layer();
 	// TODO
 	ActionSharedPtr a = ActionSharedPtr(new Action());
 	a->Attack();
