@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <memory>
+#include <vector>
 
 // Camera Datastructure -- if we set the value to around 10000.00 it will be pretty far away
 //#define N64_DM_CAMERA_ZOOM			0x339d08ac//0x3c4214ac
@@ -49,6 +51,8 @@ public:
 	uint8_t discrete_x();
 	uint8_t discrete_y();
 };
+
+void clamp(std::shared_ptr<std::vector<float>> a, float min, float max);
 
 typedef union
 {

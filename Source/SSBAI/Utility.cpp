@@ -1,5 +1,9 @@
 #include "stdafx.h"
 #include "Utility.h"
+#include <memory>
+#include <vector>
+#include <algorithm>
+
 
 Vector2::Vector2()
 {
@@ -38,4 +42,9 @@ uint8_t Vector2::discrete_y()
 	return static_cast<uint8_t> (this->y * 255);
 }
 
-
+void clamp(std::shared_ptr<std::vector<float>> a, float min_clamp, float max_clamp)
+{
+	for (std::vector<float>::iterator val = a->begin(); val != a->end(); ++val) {
+		*val = (std::max)(min_clamp, (std::min)(*val, max_clamp));
+	}
+}

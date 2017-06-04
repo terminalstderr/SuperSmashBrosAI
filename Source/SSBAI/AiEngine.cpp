@@ -70,6 +70,7 @@ std::shared_ptr<std::vector<float>> AiEngine::get_input_layer(StateSharedPtr sta
 	ret->insert(ret->end(), tmp->begin(), tmp->end());
 	tmp = state->get_player_distance();
 	ret->insert(ret->end(), tmp->begin(), tmp->end());
+	clamp(ret, 0.0, 1.0);
 	// XXX We need to make sure that the input layer is at least the size of the first hidden network layer
 	ret->resize(this->hidden_layer_width, 0.0);
 	return ret;
