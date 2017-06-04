@@ -28,7 +28,7 @@ ExperienceSharedPtr ReplayMemory::sampleExperience()
 	{
 		std::uniform_int_distribution<unsigned> d(1, memory.size());
 		unsigned i = d(rng);
-		return memory[i];
+		return memory[i-1];
 	}
 }
 

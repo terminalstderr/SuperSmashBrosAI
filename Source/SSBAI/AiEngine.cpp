@@ -84,8 +84,8 @@ ActionSharedPtr AiEngine::predict(const StateSharedPtr state)
 		hli = this->hidden_layer_outputs[i];
 	}
 
-	// Now we finally run our output layer 
-	compute_output_layer(output_layer, this->hidden_layer_outputs[this->hidden_layer_count], &output_layer_outputs);
+	// Now we finally run our output layer (notice that hli was advanced by the for loop above)
+	compute_output_layer(output_layer, hli, &output_layer_outputs);
 
 	// Generate the action from the final output layer
 	ActionSharedPtr a = get_action(output_layer_outputs);

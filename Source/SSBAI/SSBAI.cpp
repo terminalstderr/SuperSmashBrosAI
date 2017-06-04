@@ -34,6 +34,7 @@ namespace ssbai
 	// The last state we were in was s0, the last action we used was a0.
 	// Insert s0,a0,r1,s1 into replay memory
 	// Global SSBAI objects
+	bool initialized = false;
 	AiEngine ai_engine;
 	ReplayMemory replay_memory;
 
@@ -71,6 +72,10 @@ namespace ssbai
 		action->apply(my_inputs);
 	}
 
+	void init() {
+		ai_engine.init(1, 128);
+	}
+
 	// We only need to hold onto 'last' action. (i.e. just 'a')
 	//
 	// 
@@ -78,6 +83,12 @@ namespace ssbai
 	//  
 	void Hooks::frame_update(uint8_t *memory, uint32_t *controller1, uint32_t *controller2)
 	{
+		if (!initialized)
+		{
+			init();
+			initialized = true;
+		}
+
 		MYBUTTONS c2;
 		c2.Value = *controller2;
 		if (!engine_enabled(c2))
