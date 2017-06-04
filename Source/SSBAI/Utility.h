@@ -20,6 +20,12 @@
 //                  0x067200c0
 // We are off by F620B40
 
+// Reasonable assumption that the game won't have damage higher than 500 
+#define MAX_DAMAGE 500
+// These are the min and max locations for Fox's level
+#define MAX_LOCATION_RADIUS_X 14500
+#define MAX_LOCATION_RADIUS_Y 11000
+
 #define GET_FLOAT(x) *((float*)x)
 #define GET_UINT(x) *((unsigned*)x)
 class State;
@@ -27,12 +33,12 @@ class Action;
 
 
 class Vector2 {
-private:
+public:
 	float x, y;
 
-public:
 	Vector2();
 	void update(float x, float y);
+
 	uint8_t discrete_x();
 	uint8_t discrete_y();
 };

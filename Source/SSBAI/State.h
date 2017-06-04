@@ -36,4 +36,5 @@ public:
 	std::shared_ptr<std::vector<float>> get_locations();
 	std::shared_ptr<std::vector<float>> get_velocities();
 	std::shared_ptr<std::vector<float>> get_player_distance();
+	std::shared_ptr<std::vector<float>> get_damages();
 };

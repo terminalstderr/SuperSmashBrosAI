@@ -62,6 +62,8 @@ std::shared_ptr<std::vector<float>> AiEngine::get_input_layer(StateSharedPtr sta
 	std::shared_ptr<std::vector<float>> ret = state->get_buttons();
 	std::shared_ptr<std::vector<float>> tmp = state->get_locations();
 	ret->insert(ret->end(), tmp->begin(), tmp->end());
+	tmp = state->get_damages();
+	ret->insert(ret->end(), tmp->begin(), tmp->end());
 	tmp = state->get_velocities();
 	ret->insert(ret->end(), tmp->begin(), tmp->end());
 	tmp = state->get_player_distance();

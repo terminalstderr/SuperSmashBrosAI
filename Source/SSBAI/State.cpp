@@ -110,8 +110,16 @@ std::shared_ptr<std::vector<float>> State::get_buttons()
 
 std::shared_ptr<std::vector<float>> State::get_locations()
 {
-	// TODO
-	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	std::shared_ptr<std::vector<float>> ret = std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	// We have MAX_RADIUS defined which is essentially the maximum amount of space (negative or positive) that a player can move on the screen.
+	// On Fox's level this appears to be around -10,000 to 10,000.
+	// The math is to normalize the location to the range of (0.0, 1.0) 
+	// We may want to do a 'min-clamp' to ensure it doesn't go over 1.0, but this should be fine without
+	ret->push_back((enemy_state.location.x + MAX_LOCATION_RADIUS_X) / (2 * MAX_LOCATION_RADIUS_X));
+	ret->push_back((enemy_state.location.y + MAX_LOCATION_RADIUS_Y) / (2 * MAX_LOCATION_RADIUS_Y));
+	ret->push_back((my_state.location.x + MAX_LOCATION_RADIUS_X) / (2 * MAX_LOCATION_RADIUS_X));
+	ret->push_back((my_state.location.y + MAX_LOCATION_RADIUS_Y) / (2 * MAX_LOCATION_RADIUS_Y));
+	return ret;
 }
 
 std::shared_ptr<std::vector<float>> State::get_velocities()
@@ -124,6 +132,18 @@ std::shared_ptr<std::vector<float>> State::get_player_distance()
 {
 	// TODO
 	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+}
+
+std::shared_ptr<std::vector<float>> State::get_damages()
+{ 
+	// This is the overall damage delt to each player
+	std::shared_ptr<std::vector<float>> ret = std::shared_ptr<std::vector<float>>(new std::vector<float>());
+	
+	// We have a MAX_DAMAGE defined which is a reasonable maximum for damage (might want to do a 'min-clamp' to ensure it doesn't go over 1.0, but that is not strictly nessecary)
+	ret->push_back(static_cast<float>(enemy_state.damage) / MAX_DAMAGE);
+	ret->push_back(static_cast<float>(my_state.damage) / MAX_DAMAGE);
+
+	return ret;
 }
 
 PlayerState::PlayerState()
