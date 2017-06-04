@@ -5,7 +5,7 @@
 #include <omp.h>
 
 
-void PlayerState::update_p1(uint8_t *offset)
+void PlayerState::update_p1(uint8_t *offset, double delta_time)
 {
 	// For some reason, we have to compute the addresses in their own expression -- this probably has something to do with the usage of the 'GET_XXX' macros.
 	// If you do try GET_FLOAT(offset + N64_XXX) then you will see "Access violation reading location XXXX" in the Output window of Visual Studio
@@ -13,12 +13,10 @@ void PlayerState::update_p1(uint8_t *offset)
 	uint8_t *damage_addr = offset + N64_DM_PLAYER1_DAMAGE;
 	uint8_t *location_x_addr = offset + N64_DM_PLAYER1_LOCATION_X;
 	uint8_t *location_y_addr = offset + N64_DM_PLAYER1_LOCATION_Y;
-	location.update(GET_FLOAT(location_x_addr), GET_FLOAT(location_y_addr));
-	damage = GET_UINT(damage_addr);
-	life_loss = GET_UINT(life_loss_addr);
+	update(life_loss_addr, damage_addr, location_x_addr, location_y_addr, delta_time);
 }
 
-void PlayerState::update_p2(uint8_t *offset)
+void PlayerState::update_p2(uint8_t *offset, double delta_time)
 {
 	// For some reason, we have to compute the addresses in their own expression -- this probably has something to do with the usage of the 'GET_XXX' macros.
 	// If you do try GET_FLOAT(offset + N64_XXX) then you will see "Access violation reading location XXXX" in the Output window of Visual Studio
@@ -26,9 +24,20 @@ void PlayerState::update_p2(uint8_t *offset)
 	uint8_t *damage_addr = offset + N64_DM_PLAYER2_DAMAGE;
 	uint8_t *location_x_addr = offset + N64_DM_PLAYER2_LOCATION_X;
 	uint8_t *location_y_addr = offset + N64_DM_PLAYER2_LOCATION_Y;
+	update(life_loss_addr, damage_addr, location_x_addr, location_y_addr, delta_time);
+}
+
+void PlayerState::update(uint8_t * life_loss_addr, uint8_t * damage_addr, uint8_t * location_x_addr, uint8_t * location_y_addr, double delta_time)
+{
+	// 
 	location.update(GET_FLOAT(location_x_addr), GET_FLOAT(location_y_addr));
+	velocity = (location - last_location) / delta_time;
+	acceleration = (velocity - last_velocity) / delta_time;
 	damage = GET_UINT(damage_addr);
 	life_loss = GET_UINT(life_loss_addr);
+	// Store these for euler differentiated derived metrics (velocity, acceleration
+	last_location = location;
+	last_velocity = velocity;
 }
 
 State::~State()
@@ -45,8 +54,8 @@ void State::update(uint8_t *memory_offset, uint32_t *enemy_inputs)
 {
 	double this_frame_time = omp_get_wtime();;
 	double delta = this_frame_time - last_frame_time;
-	my_state.update_p1(memory_offset);
-	enemy_state.update_p2(memory_offset);
+	my_state.update_p1(memory_offset, delta);
+	enemy_state.update_p2(memory_offset, delta);
 	enemy_buttons.Value = *enemy_inputs;
 	last_frame_time = this_frame_time;
 }
@@ -103,6 +112,12 @@ std::shared_ptr<std::vector<float>> State::get_velocities()
 {
 	// TODO
 	return std::shared_ptr<std::vector<float>>(new std::vector<float>());
+}
+
+std::shared_ptr<std::vector<float>> State::get_accelerations()
+{
+	// TODO
+	return std::shared_ptr<std::vector<float>>();
 }
 
 std::shared_ptr<std::vector<float>> State::get_player_distance()

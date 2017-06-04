@@ -39,6 +39,9 @@ public:
 	Vector2();
 	void update(float x, float y);
 
+	Vector2 operator-(const Vector2 &rhs);
+	Vector2 operator/(const double rhs);
+
 	uint8_t discrete_x();
 	uint8_t discrete_y();
 };

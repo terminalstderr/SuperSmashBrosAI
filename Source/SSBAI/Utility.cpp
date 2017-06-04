@@ -13,6 +13,20 @@ void Vector2::update(float x, float y)
 	this->y = y;
 }
 
+Vector2 Vector2::operator-(const Vector2 & rhs)
+{
+	Vector2 ret = Vector2();
+	ret.update(this->x - rhs.x, this->y - rhs.y);
+	return ret;
+}
+
+Vector2 Vector2::operator/(const double rhs)
+{
+	Vector2 ret = Vector2();
+	ret.update(this->x/rhs, this->y/rhs);
+	return ret;
+}
+
 // Assumes that the vector is normalized
 uint8_t Vector2::discrete_x()
 {
