@@ -6,6 +6,7 @@
 #include "Action.h"
 #include "Experience.h"
 
+#define POSSIBLE_STATE_COUNT 24
 #define POSSIBLE_ACTION_COUNT 7
 #define OUT_LEFT_RIGHT 0
 #define OUT_UP_DOWN 1

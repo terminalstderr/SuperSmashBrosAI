@@ -82,8 +82,8 @@ namespace ssbai
 	}
 
 	void init() {
-		unsigned depth = 20;
-		unsigned height = 24; // XXX DONT CHANGE HEIGHT!
+		unsigned depth = 12;
+		unsigned height = 128;
 		logger() << "Initializing new engine! (" << depth << "," << height << ")" << std::endl;
 		ai_engine.init(depth, height);
 		ai_engine.rand();

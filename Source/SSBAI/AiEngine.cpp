@@ -21,7 +21,15 @@ void AiEngine::init(unsigned hidden_layer_count, unsigned hidden_layer_width)
 	// Handle hidden layers' perceptrons (Network Layers) and output vectors
 	for (unsigned i = 0; i < hidden_layer_count; i++) {
 		NetworkLayer nl;
-		nl.init(hidden_layer_width, hidden_layer_width);
+		// The first layer of the network only has POSSIBLE_STATE_COUNT inputs, not the full hidden_layer_width
+		if (i == 0) 
+		{
+			nl.init(hidden_layer_width, POSSIBLE_STATE_COUNT);
+		}
+		else 
+		{
+			nl.init(hidden_layer_width, hidden_layer_width);
+		}
 		hidden_layers.push_back(nl);
 		std::vector<float> *hlo = new std::vector<float>(hidden_layer_width, 0.0);
 		hidden_layer_outputs.push_back(hlo);
@@ -51,7 +59,7 @@ void AiEngine::compute_output_layer(const NetworkLayer &layer, const std::vector
 		std::vector<float>	*weights = layer.getPerceptronWeights(p);
 		const float			*bias = layer.getPerceptronBias(p);
 		float accumulator = 0.0;
-		for (unsigned i = 0; i < this->hidden_layer_width; ++i)
+		for (unsigned i = 0; i < weights->size(); ++i)
 		{
 			accumulator += (*input_layer)[i] * (*weights)[i];
 		}
@@ -99,9 +107,7 @@ std::shared_ptr<std::vector<float>> AiEngine::get_input_layer(StateSharedPtr sta
 	tmp = state->get_player_distance();
 	ret->insert(ret->end(), tmp->begin(), tmp->end());
 	clamp(ret, 0.0, 1.0);
-	// XXX We need to make sure that the input layer is at least the size of the first hidden network layer
-	// XXX TODO XXX TODO XXX This is broken
-	ret->resize(this->hidden_layer_width, 0.0);
+	// TODO: assert that ret.size() == POSSIBLE_STATE_COUNT
 	return ret;
 }
 
@@ -131,10 +137,11 @@ void AiEngine::adjustWeights(const ExperienceSharedPtr exp)
 	// TODO
 }
 
+// TODO: In our code we assume that the input size will be greater than or equal to the layer size.
 void NetworkLayer::init(unsigned layer_size, unsigned input_size)
 {
 	biases.resize(layer_size, 0.0);
-	for (unsigned i = 0; i < input_size; ++i)
+	for (unsigned i = 0; i < layer_size; ++i)
 	{
 		weights.push_back(new std::vector<float>(input_size, 0.0));
 	}
