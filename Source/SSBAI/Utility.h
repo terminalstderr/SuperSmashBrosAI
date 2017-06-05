@@ -53,7 +53,8 @@ public:
 	uint8_t discrete_y();
 };
 
-void clamp(std::shared_ptr<std::vector<float>> a, float min, float max);
+void clamp(std::shared_ptr<std::vector<float>> &a, float min, float max);
+void normalize(std::shared_ptr<std::vector<float>> &a);
 
 typedef union
 {
@@ -84,10 +85,28 @@ typedef union
 	};
 } MYBUTTONS;
 
+typedef union
+{
+	uint8_t Value;
+	struct
+	{
+		unsigned LEFT_RIGHT : 1;
+		unsigned UP_DOWN : 1;
+		unsigned SPEED : 1;
+		unsigned SHEILD : 1;
+		unsigned ATTACK : 1;
+		unsigned SPECIAL : 1;
+		unsigned JUMP : 1;
+		unsigned Reserved : 1;
+	};
+} ACTIONS;
 
-void seed_uniform_random();
+
+
+void seed_uniform_random(unsigned long long x);
 
 // This is inclusive, both lower and upper can show up in the results!
 unsigned uniform_random(unsigned lower, unsigned upper);
+float uniform_random(float lower, float upper);
 
 std::ofstream& logger();

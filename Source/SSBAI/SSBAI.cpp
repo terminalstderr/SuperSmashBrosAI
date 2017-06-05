@@ -64,7 +64,7 @@ namespace ssbai
 		start = omp_get_wtime();
 		action = ai_engine.predict(state);
 		elapsed = omp_get_wtime() - start;
-		logger() << "Forward Propogation:  " << std::fixed << std::setprecision(3) <<  elapsed << std::endl;
+		logger() << "Forward Propogation:  " << std::fixed << std::setprecision(4) <<  elapsed << std::endl;
 
 		// Teach the AI engine now
 		start = omp_get_wtime();
@@ -74,7 +74,7 @@ namespace ssbai
 			ai_engine.adjustWeights(e);
 		}
 		elapsed = omp_get_wtime() - start;
-		logger() << "Backward Propogation: " << std::fixed << std::setprecision(3) << elapsed << std::endl;
+		logger() << "Backward Propogation: " << std::fixed << std::setprecision(4) << elapsed << std::endl;
 	}
 
 	void env_post_update(uint32_t *my_inputs) {
@@ -82,7 +82,8 @@ namespace ssbai
 	}
 
 	void init() {
-		unsigned depth = 8;
+		seed_uniform_random(135412346235);
+		unsigned depth = 1;
 		unsigned height = 128;
 		logger() << "Initializing new engine! (" << depth << "," << height << ")" << std::endl;
 		ai_engine.init(depth, height);
