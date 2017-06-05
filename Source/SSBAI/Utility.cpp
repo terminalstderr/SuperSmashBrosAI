@@ -65,9 +65,14 @@ unsigned uniform_random(unsigned lower, unsigned upper)
 	return d(rng);
 }
 
-std::ofstream logger()
+std::ofstream *_ssbai_logfile = NULL;
+std::ofstream& logger()
 {
-	std::ofstream logfile;
-	logfile.open("C:/Users/Ryan/repos/project64/log.txt", std::ios_base::app);
-	return logfile;
+	if (_ssbai_logfile == NULL) {
+		_ssbai_logfile = new std::ofstream();
+		#ifdef DEBUG
+		_ssbai_logfile->open("C:/Users/Ryan/repos/project64/log.txt", std::ios_base::app);
+		#endif
+	}
+	return *_ssbai_logfile;
 }

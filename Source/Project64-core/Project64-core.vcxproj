@@ -36,6 +36,11 @@
       <AdditionalIncludeDirectories>$(Root)Source/SSBAI;.\;$(SolutionDir)\Source;$(SolutionDir)\Source\3rdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(Root)Source/SSBAI;.\;$(SolutionDir)\Source;$(SolutionDir)\Source\3rdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdParty\7zip.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>

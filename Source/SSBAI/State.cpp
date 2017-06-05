@@ -70,7 +70,7 @@ void State::copy(StateSharedPtr other)
 float State::get_reward()
 {
 	// Reward is 1/20th of the damage ratio plus the enemy life loss
-	return 0.05 * (enemy_state.damage_delta / my_state.damage_delta) + enemy_state.life_loss;
+	return 0.05 * (enemy_state.damage_delta - my_state.damage_delta) + enemy_state.life_loss;
 }
 
 std::shared_ptr<std::vector<float>> State::get_buttons()
