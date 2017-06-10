@@ -1,8 +1,16 @@
 \chapter*{Project Description}
 
-We will build an artifical intelligence (AI) actor that can play Super Smash Bros. (SSB) as the character Kirby.
-The end-of-term goal is to be able to defeat an average human opponents in real-time.
-Our AI engine will perform a major computation to determine the best next action for Kirby given the current state and action. 
-Our target performance is to be able to calculate the next action of the AI engine per frame. 
-This means we want to perform this AI work approximately 30 times per second or at a rate of $33ms$ per engine output.
+We built an artificial intelligence (AI) actor that can play Super Smash Bros. (SSB) as the character Kirby.
+%The end-of-term goal is to be able to defeat an average human opponents in real-time.
+We set out to be able to defeat an average human player; our project timeline did not allow for such performance.
+
+Although our original goal was not met, we were able to accomplish many large subgoals. 
+First, we constructed a framework for any generic AI agent to play SSB using the open source Project64 Emulator.
+Second, we implemented three neural network layer prediction algorithms including: Perceptron, ReLU, and Linear. 
+Third, we implemented a parameterized neural network construction that allows building networks of various sizes.
+Finally, we integrated all of these pieces and did performance analysis with various levels of parallelization throughout the implemented network.
+
+Our AI engine performs a major computation, forward propagation through a deep neural network, to determine the best next action for Kirby given the current state and action. 
+Our target performance is to be able to calculate the next action of the AI engine every $k^{th}$ frame. 
+This means we want to perform this AI work approximately 15 times per second, or at a rate of $66ms$ per engine output.
 We will achieve this performance through parallelization of the AI engine.
