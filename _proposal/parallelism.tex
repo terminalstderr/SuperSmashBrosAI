@@ -1,27 +1,102 @@
-\chapter*{Optimization Plan}
+\chapter*{AI Engine}
 
-\section{Primary Sequential Constraint -- Video Game Time-steps}
+\section*{Reinforcement Learning}
+Reinforcement learning (RL) is a model for learning that learns in an active environment with rewards.
+This is an alternative to both of the major learning paradigms: supervised and unsupervised learning.
+The RL model can be thought of as containing two components, the environment (SSB) which stochastically determines state and reward and the agent (AI) which intelligently decides the next action based on the current environment.
+
+\ssbFigure{RL.png}
+
+In a nutshell, the ``label'' of supervised learning is replaced with ``reward'' in RL.
+Additionally, the nature of systems modeled as RL are not viewed as distinct independent events, but rather a \textit{stream} of independent events.
+Based on this stream nature and the per-moment reward, the Markov Decision Process is used as the underlying mathematical model for RL problems.
+From this, the Bellman Equation (Q function) is the core of reinforcement learning. 
+This function tells us the \textit{maximum future return of each state-action pair}:
+
+\begin{equation}
+Q(s,a) = r + \gamma max_{a'}Q(s', a')
+\end{equation}
+
+Where $s$ is the current state, $a$ is the current action, $r$ is the reward earned in the next step, $\gamma$ is the learning rate, $s'$ is the resultant state, and $a'$ is the resultant action.
+
+This is a huge insight for our AI agent!
+The substructure nature of the Q function allows us to solve this problem via Dynamic Programming if we have a small enough state and action complexity.
+Once we have the solution for the Q function, we decide our next action by running the Q function over every action for the current state to greedily decide what the best action is for our AI agent's future.
+
+\begin{equation}
+\texttt{best} a = argmax_a Q(s, a)
+\end{equation}
+
+Unfortunately, determining the Q function absolutely is not tractable for our problem.
+We must instead approximate the Q function using a deep neural network.
+
+\section*{Deep Neural Network}
+A deep neural network (NN) is commonly defined as a neural network with more than one hidden layers.
+A neural network is a typically a collection of neurons (compute nodes) arranged in a network (regular directed acyclic graph).
+In the remainder of this document, we consider NNs with $>1$ hidden layers that have a fully connected forward feed network.
+
+Our NN was implemented using C++11.
+We used the standard library vectors for our primary container for inputs.
+To make our implementation simpler, we leverage standard shared pointers when doing several tasks.
+This has not demonstrated any performance issues, but the unpredictable nature of garbage collection may require being more careful with memory usage.
+Finally, all randomization was performed using the standard uniform random number generation distribution using the standard Mersene Twister 19937 random number engine.
+
+Our organization is focused at completing the computation of a network layer as expediently as possible, which we will discuss in section \ref{parallel}.
+The structure indicated below is in a structure-of-arrays (SoA) style to represent a Network Layer.
+
+\ssbFigure{soa.png}
+
+Our implementation is able to perform forward propagation on any network layer using three simple variety of computation including.
+\begin{enumerate}
+\item Lossy Rectifier
+\item Linear
+\item Threshold (Perception)
+\end{enumerate}
+Currently, the NN has been constructed to allow all hidden layers to use one variety of computation while the output layer can use a different variety.
+The neural network used in testing was XXX.
+
+
+\section*{Parallelization}
+
+\label{parallel}
+In regards to parallelization, there are many restrictions disallowing us from parallelizing major portions of our application.
+However, the NN implementation is nearly embarrassingly parallel except for some very regular reduction and stencil dependencies.
+
+\subsection*{Sequential Restrictions}
 There is a serial bottleneck in that our game AI works in a world where each scene depends on the prior.
 This is kin to a serial physics simulation, and is an inherit limitation to building a video game AI.
 To get more parallelization at this level, we could instead perform multiple simulations in parallel (although this is out of the scope of this project).
 
-\section{Sequential Constraint -- Gathering State}
-Gathering state is the action of getting the state from the current memory space of the video game.
-This will be quite limited as each state depends on the video game.
-There is a direct per-frame dependency on the video game.
-Additionally, the parallelization of reads is limited by the underlying system's bandwidth/latency.
+\subsection*{Parallelization of Nodes}
+Each node performs a dot product between two vectors of 128 floats (weights and inputs).
+This is a reduction of $O(height)$ or $128$ elements in our system.
+The granularity of this effort is very vectorizable, but much smaller than the recommended grain size proposed by TBB and Cilk for generic reduction.
+We use OpenMP in our implementation. 
+We reason that there is a high likelihood that the thread spawn overhead outweighs the potential parallelization benefits of doing a sum reduction on 128 elements.
 
-\section{Parallel -- Artificial Intelligence}
-Determining the next action for Kirby to perform is the main task in this work.
-This process will include a deep neural network (4+ layers where hidden layers containing ~128 neurons).
-Neural networks using a forward feed approach when implemented following a basic design have a straightforward path to parallelization. 
-Using a pipelining pattern between network layers, and a map pattern (with a parameterized elemental function) within each layer, the parallel execution time is the max execution of all the neurons in the network.
-A serial implementation would have execution time of roughly the sum of execution of all neurons in the network.
-Assume our network will have roughly 300+ neurons, this has potential for a linear speedup of 300 times.
+% TODO Parallel Code
 
-\ssbFigure{ANN.png}
+% TODO Speedup
 
-Using the pipelined implementation will result in multiple frames of delay from the state gathering to the response action.
-This will manifest as input lag for our AI engine. 
+\subsection*{Parallelization of Network Layers}
+Each layer has to perform $O(height)$ or $128$ node computations.
+This step is embarrassingly parallel!
 
-We will initially look at an OpenMP parallelization solution which will use more heavy weight CPU threads to leverage parallelization. 
+% TODO Parallel Code
+
+% TODO Speedup
+
+\subsection*{Parallelization between Network Layers}
+The network as a whole has to perform $O(depth)$ or XXX network layer computations.
+This can be reasoned about as a stencil where each node depends on the entire prior layer.
+So we we reason that we can use the recurrence pattern to ripple the computation through the network to achieve some parallelization.
+We notice that this recurrence is actually accomplished using the technique from the prior section.
+
+Alternately, we notice that we could use a staged pipelining approach to be able to actually compute layers in parallel.
+This would enable us to achieve $O(depth)$ speedup, but would also result in an added latency to get a network output for its provided inputs.
+We can emulate the potential speedup achievable by not-modifying the node weights and biases and using the map pattern between network layers.
+
+% TODO Parallel Code
+
+% TODO Speedup
+

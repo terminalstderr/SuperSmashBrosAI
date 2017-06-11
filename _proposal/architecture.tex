@@ -1,8 +1,52 @@
 \chapter*{Highlevel Architecture}
 
-Development will be performed on the Windows platform using Visual Studio 2015.
-We will base our project off of the open source Project64 emulator.
-Modifications will be made to the emulator for the process of state gathering and enacting actions.
+All development was be performed on the Windows platform using Visual Studio 2015.
+We have based our project off of the open source Project64 emulator.
+
+Below is the overlying software architecture which indicates the data flow.
+
+\ssbFigure{SSBAI_dll.png}
+
+We explode this data flow to reveal critical tasks that are completed per frame.
+
+\ssbFigure{SSBAI_tasks.png}
+
+
+\section*{The Hook: Emulator Modification}
+First, we inserted one simple hook was into the emulator's per-frame-update function. 
+We used this hook to get a pointer to the N64 memory space. 
+This provided freedom to access any in-game data structures in real time, at each time step. 
+
+\section*{Finding N64 Data Structures}
+Determining the memory offset of interesting data structures within the emulators address space was performed using Cheat Engine.
+% http://www.cheatengine.org/
+Usage of this tool can be summarized as 
+\begin{enumerate}
+\item reviewing some range of the process' memory,
+\item  running the process for a step performing some distinct action, then
+\item narrowing the investigated memory range using a byte-wise diff.
+\end{enumerate}
+
+More precisely, this tool acts as a debugger with a rich interface and a set of features that easily enable finding particular emulated data structures.
+The tool is performing a sequence of diffs over the virtual memory space of the debugged process as the process is running.
+Each diff reduces the amount of virtual memory space being considered until eventually there are only a handful of addresses that are correlated to the distinct action being performed.
+
+As an example, to find the memory offset associated to the location of a character:
+\begin{enumerate}
+\item Run an initial scan over the N64 virtual address space
+\item Move the character to the left in the emulator
+\item Run a diff in Cheat Engine
+\item Repeat step 2 and 3 until the relevent/correlated virtual address space is only a few addresses.
+\end{enumerate}
+At this point, we have determined the memory address that is correlated to the action of the character moving.
+Doing some investigation of the nearby memory spaces, we easily find the address corresponding to the floating point values of the characters x and y position!
+
+\section*{Extracting State Values}
+
+\section*{Enacting Actions}
+
+
+the to the memory refernce will be made to the emulator for the process of state gathering and enacting actions.
 An independent AI library (SSBAI) will be constructed to perform the AI calculations and ultimately decide what action Kirby will take.
 
 \url{https://github.com/terminalstderr/SuperSmashBrosAI}
@@ -17,12 +61,4 @@ State.preprocess();
 NextAction = SsbaiEngine.predict(State);
 ControllerInputs = ActionPusher(NextAction);
 \end{verbatim}
-
-Below is the overlying software architecture which indicates the data flow.
-
-\ssbFigure{SSBAI_dll.png}
-
-We explode this data flow to reveal critical tasks that are completed per frame.
-
-\ssbFigure{SSBAI_tasks.png}
 
