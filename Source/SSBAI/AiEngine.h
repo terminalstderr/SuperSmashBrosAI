@@ -6,6 +6,15 @@
 #include "Action.h"
 #include "Experience.h"
 
+#define SKIP_FRAME_MODULO 4
+#define REPLAY_LEARN_COUNT 2
+#define NTHREAD 4
+#define NDEPTH 7
+#define NHEIGHT 512
+#define NODE_PARALLEL false
+#define LAYER_PARALLEL true
+#define NETWORK_PARALLEL true
+
 #define POSSIBLE_STATE_COUNT 24
 #define POSSIBLE_ACTION_COUNT 7
 #define POSSIBLE_ACTION_SPACE 1 << POSSIBLE_ACTION_COUNT // 2 ^ POSSIBLE_ACTION_COUNT

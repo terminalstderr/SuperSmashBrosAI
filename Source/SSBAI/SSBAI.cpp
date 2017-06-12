@@ -9,14 +9,12 @@
 #include "AiEngine.h"
 #include "ReplayMemory.h"
 
-#define SKIP_FRAME_MODULO 4
-#define REPLAY_LEARN_COUNT 2
-
 namespace ssbai
 {
 
 	unsigned long frame_counter = 0;
-
+	unsigned long stat_count = 0;
+	double stat_accumulator = 0.0;
 	bool enabled_pressed = false;
 	bool m_engine_enabled = false;
 	bool engine_enabled(MYBUTTONS controller) {
@@ -64,7 +62,8 @@ namespace ssbai
 		start = omp_get_wtime();
 		action = ai_engine.predict(state);
 		elapsed = omp_get_wtime() - start;
-		logger() << "Forward Propogation:  " << std::fixed << std::setprecision(4) <<  elapsed << std::endl;
+		stat_accumulator += elapsed;
+		++stat_count;
 
 		// Teach the AI engine now
 		start = omp_get_wtime();
@@ -74,7 +73,6 @@ namespace ssbai
 			ai_engine.adjustWeights(e);
 		}
 		elapsed = omp_get_wtime() - start;
-		logger() << "Backward Propogation: " << std::fixed << std::setprecision(4) << elapsed << std::endl;
 	}
 
 	void env_post_update(uint32_t *my_inputs) {
@@ -83,11 +81,25 @@ namespace ssbai
 
 	void init() {
 		seed_uniform_random(135412346235);
-		unsigned depth = 1;
-		unsigned height = 128;
-		logger() << "Initializing new engine! (" << depth << "," << height << ")" << std::endl;
+		omp_set_num_threads(NTHREAD);
+		unsigned depth = NDEPTH;
+		unsigned height = NHEIGHT;
+		char *pmask = (NODE_PARALLEL ? "Node, " : "");
+		(NODE_PARALLEL && LAYER_PARALLEL ? "Node, Layer" : "");
+		logger() << "Initializing new engine! (" << depth << "," << height << ")" << "threads: " << NTHREAD << std::endl
+			<< (NODE_PARALLEL ? "Node, " : "") 
+			<< (LAYER_PARALLEL ? "Layer, " : "") 
+			<< (NETWORK_PARALLEL ? "Network" : "") 
+			<< std::endl;
 		ai_engine.init(depth, height);
 		ai_engine.rand();
+	}
+
+	void print_stats(MYBUTTONS controller) {
+		if (controller.U_DPAD) 
+		{
+			logger() << "Average Forward Prop Time: " << std::fixed << std::setprecision(8) << stat_accumulator / stat_count << std::endl;
+		}
 	}
 
 	// We only need to hold onto 'last' action. (i.e. just 'a')
@@ -105,6 +117,7 @@ namespace ssbai
 
 		MYBUTTONS c2;
 		c2.Value = *controller2;
+		print_stats(c2);
 		if (!engine_enabled(c2))
 			return;
 
@@ -121,6 +134,7 @@ namespace ssbai
 		}
 		// The env_post_update is essentially just applying an action -- we do this regardless of AI_engine skipped frames
 		env_post_update(controller1);
+
 	}
 
 

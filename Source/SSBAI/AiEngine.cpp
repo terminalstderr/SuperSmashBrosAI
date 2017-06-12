@@ -52,14 +52,18 @@ void AiEngine::rand()
 void AiEngine::forward_propogation_thresh(const NetworkLayer &layer, const std::vector<float> *input_layer, std::vector<float> *output_layer)
 {
 	// for every perceptron in the layer
-#pragma omp parallel for
+	#if LAYER_PARALLEL
+		#pragma omp parallel for
+	#endif
 	for (int p = 0; p < layer.size(); ++p)
 	{
 		// compute the magnitude of this perceptron
 		std::vector<float>	*weights = layer.getPerceptronWeights(p);
 		const float			*bias = layer.getPerceptronBias(p);
 		float accumulator = 0.0;
-		// XXX Parallelizing this loop causes significant slow-down -- this step is massively vectorizable.
+		#if NODE_PARALLEL
+			#pragma omp parallel for reduction(+:accumulator)
+		#endif
 		for (int i = 0; i < weights->size(); ++i)
 		{
 			accumulator += (*input_layer)[i] * (*weights)[i];
@@ -72,14 +76,18 @@ void AiEngine::forward_propogation_thresh(const NetworkLayer &layer, const std::
 void AiEngine::forward_propogation_relu(const NetworkLayer & layer, const std::vector<float>* input_layer, std::vector<float>* output_layer)
 {
 	// for every perceptron in the layer
-#pragma omp parallel for
+	#if LAYER_PARALLEL
+		#pragma omp parallel for
+	#endif
 	for (int p = 0; p < layer.size(); ++p)
 	{
 		// compute the magnitude of this perceptron
 		std::vector<float>	*weights = layer.getPerceptronWeights(p);
 		const float			*bias = layer.getPerceptronBias(p);
 		float accumulator = 0.0;
-		// XXX Parallelizing this loop causes significant slow-down -- this step is massively vectorizable.
+		#if NODE_PARALLEL
+			#pragma omp parallel for reduction(+:accumulator)
+		#endif
 		for (int i = 0; i < weights->size(); ++i)
 		{
 			accumulator += (*input_layer)[i] * (*weights)[i];
@@ -94,7 +102,9 @@ void AiEngine::forward_propogation_relu(const NetworkLayer & layer, const std::v
 void AiEngine::forward_propogation_linear(const NetworkLayer & layer, const std::vector<float>* input_layer, std::vector<float>* output_layer)
 {
 	// for every perceptron in the layer
-#pragma omp parallel for
+	#if LAYER_PARALLEL
+		#pragma omp parallel for
+	#endif
 	for (int p = 0; p < layer.size(); ++p)
 	{
 		// compute the magnitude of this perceptron
@@ -102,6 +112,9 @@ void AiEngine::forward_propogation_linear(const NetworkLayer & layer, const std:
 		const float			*bias = layer.getPerceptronBias(p);
 		float accumulator = 0.0;
 		// XXX Parallelizing this loop causes significant slow-down -- this step is massively vectorizable.
+		#if NODE_PARALLEL
+			#pragma omp parallel for reduction(+:accumulator)
+		#endif
 		for (int i = 0; i < weights->size(); ++i)
 		{
 			accumulator += (*input_layer)[i] * (*weights)[i];
@@ -178,7 +191,9 @@ ActionSharedPtr AiEngine::predict(const StateSharedPtr state)
 	// With our pump primed with 'hli', we now compute all of the hidden_layer_outputs
 	std::vector<float> *hli = input_layer.get();
 	// XXX Parallelizing this loop would require doing a 'per-stage' pipelining.
-	// #pragma omp parallel for
+	#if NETWORK_PARALLEL
+		#pragma omp parallel for
+	#endif
 	for (int i = 0; i < this->hidden_layer_count; ++i)
 	{
 		forward_propogation_relu(this->hidden_layers[i], hli, this->hidden_layer_outputs[i]);
