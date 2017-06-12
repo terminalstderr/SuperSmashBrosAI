@@ -13,7 +13,7 @@ We explode this data flow to reveal critical tasks that are completed per frame.
 
 \section*{The Hook: Emulator Modification}
 First, we inserted one simple hook was into the emulator's per-frame-update function. 
-We used this hook to get a pointer to the N64 memory space. 
+We used this hook to get a pointer to the N64 memory space and the N64 memory-mapped controller data structure.
 This provided freedom to access any in-game data structures in real time, at each time step. 
 
 \section*{Finding N64 Data Structures}
@@ -35,28 +35,29 @@ As an example, to find the memory offset associated to the location of a charact
 \item Run an initial scan over the N64 virtual address space
 \item Move the character to the left in the emulator
 \item Run a diff in Cheat Engine
-\item Repeat step 2 and 3 until the relevant/correlated virtual address space is only a few addresses.
+\item Repeat step 2 and 3 until there are only a few relevant/correlated addresses.
 \end{enumerate}
-At this point, we have determined the memory address that is correlated to the action of the character moving.
-Doing some investigation of the correlated memory addresses and nearby memory spaces, we easily find the address corresponding to the floating point values of the characters x and y position!
+At this point, we have determined the memory addresses that are correlated to the action of the character moving.
+Doing some investigation of and around these memory addresses, we easily find the address corresponding to the floating point values of the characters x and y position!
+Similar investigations were performed to find each characters' damage and life loss state.
 
 \section*{Extracting State Values}
 
 State extraction was performed using very crude memory manipulation.
-A set of macros was defined for reading arbitrary memory into our data structures.
-Issues arose with correctly determining the memory offset: original calculations of the memory offset were incorrect which was only discovered between successive runs after restarting Visual Studio.
+A set of macros was defined for reading arbitrary memory into our AI data structures.
+Issues arose with correctly determining the memory offset: original calculations of the N64 RAM to N64 data structure memory offset were incorrect which was only discovered between successive runs after restarting Visual Studio.
 The ultimate solution was to find the relevant data structure and get the offset of that from the emulated N64 memory address all from within Visual Studio.
 The result is that state gathering works across all development machines successfully.
 
 Normalization of the state was also performed.
 This was simply moving all data members to the range of $(-1.0, 1.0)$.
-We used domain specific information (e.g. SSB map limits, SSB max damage) to get the normalization range.
+We used domain specific information (e.g. SSB level limitations, SSB max damage) to get the normalization range.
 We also clipped the values in case somehow the limits are exceeded during game play to ensure clean processed data.
 
 \section*{Enacting Actions}
 
 Pushing an action into the emulator was trivial using a unioned bit-field.
-The controller data structure in the emulated N64 memory space is provided by the N64 emulator, so there was no need to hunt down the data structure via cheat engine.
+The controller data structure in the emulated N64 memory space Is provided by the N64 emulator, so there was no need to hunt down the data structure via cheat engine.
 
 The possible action space was originally $2^{30}$, we limited our scope to $2^7$. 
 Only combinations of the following actions are permitted:

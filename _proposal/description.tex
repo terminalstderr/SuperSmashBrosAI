@@ -13,4 +13,4 @@ Finally, we integrated all of these pieces and did performance analysis with var
 Our AI engine performs a major computation, forward propagation through a deep neural network, to determine the best next action for Kirby given the current state and action. 
 Our target performance is to be able to calculate the next action of the AI engine every $k^{th}$ frame. 
 This means we want to perform this AI work approximately 15 times per second, or at a rate of $66ms$ per engine output.
-We will achieve this performance through parallelization of the AI engine.
+We easily achieve this performance through parallelization of the AI engine.

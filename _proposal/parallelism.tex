@@ -8,13 +8,13 @@ The RL model can be thought of as containing two components, the environment (SS
 \ssbFigure{RL.png}
 
 In a nutshell, the ``label'' of supervised learning is replaced with ``reward'' in RL.
-Additionally, the nature of systems modeled as RL are not viewed as distinct independent events, but rather a \textit{stream} of independent events.
+Additionally, the nature of systems modeled as RL are not viewed as distinct independent events, but rather a \textit{stream} of events.
 Based on this stream nature and the per-moment reward, the Markov Decision Process is used as the underlying mathematical model for RL problems.
 From this, the Bellman Equation (Q function) is the core of reinforcement learning. 
 This function tells us the \textit{maximum future return of each state-action pair}:
 
 \begin{equation}
-Q(s,a) = r + \gamma max_{a'}Q(s', a')
+  Q(s,a) = r + \gamma \texttt{max}_{a'}Q(s', a')
 \end{equation}
 
 Where $s$ is the current state, $a$ is the current action, $r$ is the reward earned in the next step, $\gamma$ is the learning rate, $s'$ is the resultant state, and $a'$ is the resultant action.
@@ -24,11 +24,12 @@ The substructure nature of the Q function allows us to solve this problem via Dy
 Once we have the solution for the Q function, we decide our next action by running the Q function over every action for the current state to greedily decide what the best action is for our AI agent's future.
 
 \begin{equation}
-\texttt{best} a = argmax_a Q(s, a)
+  \texttt{best}(a) = \texttt{argmax}_a Q(s, a)
 \end{equation}
 
-Unfortunately, determining the Q function absolutely is not tractable for our problem.
-We must instead approximate the Q function using a deep neural network.
+Unfortunately, determining the Q function absolutely is not tractable for our problem; our state space is very large.
+We must instead approximate the Q function.
+We do this using a deep neural network.
 
 \section*{Deep Neural Network}
 A deep neural network (NN) is commonly defined as a neural network with more than one hidden layers.
@@ -41,7 +42,7 @@ To make our implementation simpler, we leverage standard shared pointers when do
 This has not demonstrated any performance issues, but the unpredictable nature of garbage collection may require being more careful with memory usage.
 Finally, all randomization was performed using the standard uniform random number generation distribution using the standard Mersene Twister 19937 random number engine.
 
-Our organization is focused at completing the computation of a network layer as expediently as possible, which we will discuss in section \ref{parallel}.
+Our organization is focused at completing the computation of a network layer as expediently as possible, which we will discuss below.
 The structure indicated below is in a structure-of-arrays (SoA) style to represent a Network Layer.
 
 \begin{lstlisting}
@@ -74,7 +75,9 @@ This is a simple average that might not account for any initialization bias in o
 \subsection*{Sequential Restrictions}
 There is a serial bottleneck in that our game AI works in a world where each scene depends on the prior.
 This is kin to a serial physics simulation, and is an inherit limitation to building a video game AI.
-To get more parallelization at this level, we could instead perform multiple simulations in parallel (although this is out of the scope of this project).
+To get more parallelization at this level, we could instead perform multiple simulations in parallel.
+Although this is out of the scope of this project, it is actually a technique commonly used in recent years to paralyze training efforts.
+This is a variety of weak scaling that we do not target in this work.
 
 \subsection*{Parallelization of Nodes}
 Each node performs a dot product between two vectors of \netheight floats (weights and inputs).
@@ -85,17 +88,18 @@ We reason that there is a high likelihood that the thread spawn overhead outweig
 
 \begin{lstlisting}
 // Node Compute Code
-float accumulator = 0.0;
-#pragma omp parallel for reduction(+:accumulator)
+float acc = 0.0;
+#pragma omp parallel for reduction(+:acc)
 for (int i = 0; i < 512; ++i)
-  accumulator += (*input_layer)[i] * (*weights)[i];
-(*output_layer)[p] = accumulator > 0 ? accumulator : 0.01 * accumulator;
+  acc += input_layer[i] * weights[i];
+output_layer[p] = acc > 0 ? acc : 0.01 * acc;
 \end{lstlisting}
 
 Enabling parallelization at this level results in a significant slowdown with increased CPU utilization.
 This can be attributed to being a bad granularity to enable the heavyweight parallelization that OpenMP offers.
-A set of threads being allocated for performing a reduction over \netheight elements is large.
+A set of threads being allocated for performing a reduction over \netheight elements is nonsensical.
 Additionally, the reduction nature of this computation enforces a strictly sub linear speedup.
+Finally, this code is a great candidate for vectorization.
 
 \begin{center}
 \begin{tabular}{|c|c|c|}
@@ -115,14 +119,14 @@ Each layer has to perform $O(height)$ or \netheight node computations.
 This step is embarrassingly parallel!
 
 \begin{lstlisting}
-forward_propogation(const NetworkLayer &layer, const vector<float> *input_layer, vector<float> *output_layer)
+forward_propogation(NetworkLayer &layer, vector<float> &input_layer, vector<float> &output_layer)
 {
   // Layer Compute Code
   #pragma omp parallel for
   for (int p = 0; p < 512; ++p)
   {
-    vector<float>  *weights = layer.getWeights(p);
-    const float         *bias = layer.getBias(p);
+    vector<float>  weights = layer.getWeights(p);
+    float          bias = layer.getBias(p);
     // Node Compute Code
     ...
   }
@@ -164,7 +168,7 @@ for (int i = 0; i < 7; ++i)
 \end{lstlisting}
 
 We see parallelization at this level resulting in a slowdown.
-We attribute this to the fact that the compiler is compiling to allow parallelization but either (1) there is a synchronization happening between loops or (2) the overhead of initializing scheduling and initializing so few threads is dominating the parallelization.
+We attribute this as following: either (1) there is a synchronization happening between loops or (2) the overhead of initializing scheduling and initializing so few threads is dominating the parallelization.
 The latter seems unlikely based on our investigation of Layer Parallelism seen in the prior section.
 Further investigation is required to determine what is causing this slowdown.
 
@@ -189,3 +193,8 @@ As such, we decide empirically that for our network of size on a consumer machin
 This is portrayed as the ``Per Layer'' series in the following graphic.
 
 \ssbFigure{speedup.png}
+The y-axis is the speedup achieved, the x-axis is the number of processors made available for parallelization.
+``Per Network'' is the speedup achieved parallelizing between network layers.
+``Per Node'' is the speedup achieved parallelizing at the node level.
+``Per Layer'' is the speedup achieved parallelizing at the network layer.
+
