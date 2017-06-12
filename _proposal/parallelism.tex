@@ -35,7 +35,7 @@ A deep neural network (NN) is commonly defined as a neural network with more tha
 A neural network is a typically a collection of neurons (compute nodes) arranged in a network (regular directed acyclic graph).
 In the remainder of this document, we consider NNs with $>1$ hidden layers that have a fully connected forward feed network.
 
-Our NN was implemented using C++11.
+Our NN was implemented using C++11 using ``O3'' optimization flag.
 We used the standard library vectors for our primary container for inputs.
 To make our implementation simpler, we leverage standard shared pointers when doing several tasks.
 This has not demonstrated any performance issues, but the unpredictable nature of garbage collection may require being more careful with memory usage.
