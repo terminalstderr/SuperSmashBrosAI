@@ -1,0 +1,218 @@
+
+\textit{Beating the Worlds Best at Super Smash Bros. Melee with Deep Reinforcement Learning}
+@article{firoiu2017beating,
+  title={Beating the World's Best at Super Smash Bros. with Deep Reinforcement Learning},
+  author={Firoiu, Vlad and Whitney, William F and Tenenbaum, Joshua B},
+  journal={arXiv preprint arXiv:1702.06230},
+  year={2017}
+}
+
+Very recent paper, not cited.
+
+Looks directly at the memory of the game. 
+This is actually accessing the memory of the game instead of behaving more like a human (e.g. looking at graphics and controller inputs).
+In my work we will try harder to look at the human equivilent perspective.
+
+They do NOT use a Deep Q network (DQN).
+This is a TD method of machine learning.
+
+In this paper, there are two reinforcement learning approeaches tried to compete at Super Smash Bros. Melee (SSBM).
+This game is very similar to the game we are working with.
+Their approach to data collection is very similar to ours, except they explicitely do not use the buffer information.
+They instead get precise information from memory space.
+
+They use two RL techniques, Q-Learning (which seems to be learning the 'value-function'.
+Second they use the 'policy-gradient' method which is referred to as 'actor-critics'.
+
+
+
+\textit{https://en.wikipedia.org/wiki/Reinforcement_learning}
+
+There is some \textit{reward} for completing an action well.
+We can take \textit{actions} in some \textit{environment}.
+
+Reinforcment Learning (RL) is also known as \textit{approximate dynamic programming}.
+RL is typically modeled as a Markov Decision Process (MDP) -- this indicates that some inputs into the system are _not_ under the control of the machine learning tool or may be random.
+In our case this is seen as the inputs from the oponent.
+
+This is different from Supervised Learning since ``Correct inputs and outputs are never presented, nor are suboptimal solutions explicitely flagged/corrected".
+Additionally, there is an implicit focus toward ``online learning" which is being able to do the learning as the process is running.
+
+Basic RL algorithm and overview:
+1. A set of environment and agent states "S"
+2. set of possible actions "A"
+3. Policies for transitioning from state to actions (this will be something like a full-mesh finite state machine for SSB).
+4. Rules that determine the \textit{scalar immediate reward} of a transition 
+  (this is the prediction rule).
+5. Rules that describe the actual observation 
+  (this is the actual observation).
+
+I think that (4) is the prediction, e.g. we want to maximize the scalar immediate reward!
+
+I think that we can essentially ignore (3) since we have the abillity to take all actions at any time, right?
+NOTICE: What about when we are airborn, are we allowed to jump at that time?
+Certainly we are allowed to press the button but it will not have any effect... It will have the same scalar immediate reward as not moving.
+
+Notice that we can perform \textbf{multiple actions per time slice} in a video game.
+I.e. holding 'right' while pressing attack.
+I.e. holding 'left' while pressing jump.
+Instead of saying that we perform multiple actions, we should say that we can perform _compound_ actions. 
+This makes it so that our possible actions are the power-set of the available independent actions.
+
+Basic algorithm:
+  \begin{listlisting}
+Receive Observation at time t:
+  o_t, r_t (input e.g. frame buffer, and reward, e.g. damage delt)
+  a_t : Choose an action from set of available actions.
+  the simulation advances given this action
+  \end{listlisting}
+
+The idea is that the algorithm will choose an action using all of history as its learned base.
+This makes it so that there could be a action that is worse for the next moment but has a long-term pay-off.
+Analogy: Deciding to make a locally bad decision toward a long-term good decision is like going to school -- it will pay off financailly in the long run even at a cost now.
+
+RL uses samples to optimize performance.
+RL uses function approximation to deal with large environments.
+
+\textit{RL key problem: find out which actions are good based on past experience.}
+
+Discounting is kind of like 'history weights' I think.
+
+A lot of RL assumes a fixed policy, e.g. we are just testing a policy in the provided world.
+
+Temporal Difference methods allow policy to change over time.
+  Issues is that there might not be convergence onto a single policy.
+ 
+Summary of "Playing atari with Deep Reinforcement Learning"
+There are multiple applications of reinforcement learning to generate models and train them to play video games, such as Atari games. 
+In these models, reinforcement learning finds the actions with the best reward at each play. 
+This method is a widely used method in combination with deep neural networks to teach computers to play Atari video games.
+[10]
+
+
+\textit{https://en.wikipedia.org/wiki/Temporal_difference_learning}
+
+A mix of Dynamic Programming and Monte Carlo methods.
+
+Premise: TD learning considers that subsequent predictions are often correlated in some sense.
+
+When used for RL, (our case), TD relies on the Bellman Equation (From bellman-ford Dynamic Programming, right?)
+
+Seems to be just a mathematical model for predicting reward of a given action. :D
+
+
+\textit{Sutton Book}
+
+CHAPTER 2:
+
+\quote{It is a striking feature of the reinforcement learning solution that it can achieve the effects of planning and lookahead without using a model of the opponent and without conducting an explicit search ofver possible sequences of future states and actions.}
+
+
+CHAPTER 3:
+
+``Anything that the actor cannot directly and arbitrarily modify is considered a part of the environment."
+This makes it obvious that the AI players location is part of the enviornment since it does not have \textit{arbitrary} control of the location.
+The agent-environemnt boundry represents the limit of the agent's absolute control, not of its knowledge.
+
+Notice that the 'environment' in the Reinforcement Learning model is anything that the player does not 100\% directly control.
+It might be more fruitful to look only at the opponent's bitmap and to not worry about our character's bitmap.
+
+This model is: ``Goal directed learning from interaction"
+
+``State can be a data structure, same with actions. However, rewards are always single numbers."
+Looks like there can be multiple inputs into the single reward though.
+E.g. perform a minor negative reward when something goes a little bit wrong.
+
+EX 3.1:
+tasks that can be modeled using the reinforcement learning framework:
+
+1. brushing teeth
+actions -- motor controls
+environment -- whiteness of teeth, pain receptors, dentist bills
+reward -- Joy: negative when receiving bills, slightly positive when getting complimented on smile
+
+2. Making a sandwich
+actions -- get ingredients, put down an ingredient
+environment -- how much food consumed, how tasty is the food, how much food wasted, how messy is the food
+reward -- Joy
+
+3. Finding a Job
+actions -- apply, interview, negotiate
+environment -- market, 
+
+4. Fighting Robot
+actions -- punch, block, move
+environment -- opponent, room, damage dealt, kos
+reward -- super positive for KOs, slightly positive or negative for damage ratio
+
+EX 3.2:
+When the reward cannot be quantified, we cannot use this framework.
+
+EX 3.3:
+Just depends on what we want the reward to be based on -- do we want to get to a location (i.e. guidence) then we should be at the highest level of abstraction.
+Do we want to have the reward be related to not getting in a collision? Then we should probably be at the lower level.
+Do we want to have the reward be the minimal effort/stress for the driver? then we should be at the muscular and Computer vision level.
+
+
+Section 3.2:
+
+Reward is a simple number for each timestep.
+Goal is to maximize the Total amount of reward recieved.
+
+What if we make it so that getting a KO gives 350 reward.
+Each point of damage is worth 1 reward.
+Each health lost is worth -1 reward.
+Each life lost is -350 reward.
+
+NOTICE: The reward signal is \textbf{not} the place to impart knowledge about \textit{how to achieve the end goal}.
+I.e. by this we should \textbf{absolutely not} use SSB damage as a reward.
+
+Section 3.3: 
+
+How do we actually maximize on the reward?
+SSB can be thought of as an episodic task where each episode is a KO?
+Or where each episode is an entire gameplay session.
+
+Total Reward (return) can be calculated very simply as the sum of all reward.
+
+For some reason, we use a discounted reward.
+Where each n+1 timestep is worth a little bit less than the nth timestep...
+Using an exponential decay parameter known as the \textit{discount rate}.
+
+The closer the discount rate is to '0', the less it cares about the future.
+The closer the discount rate is to '1', the more farsighted it is.
+
+\textbf{question: Would there be any reason to use discounting if we are epsodic?}
+
+
+Section 3.5:
+
+\textit{Markov Property}: A state signal that succeeds in retaining all relevent information is said to be Markov.
+In a game this means that the state describes all relevent information to win the game.
+I.e. all of the locations on the board for a game of checkers.
+``Independence of path" property -- all that matters is in the current state signal.
+
+We assume the Markov Property -- but we know that it is not completely true unless we encode all of the history in our state.
+What if we encode just some of the history into our state, like when a particular move started?
+
+\textbf{NOTICE:}
+To get closer to the markov property, it would be super duper helpful to have the state maintain "all recently received inputs."
+
+Section 3.6
+
+Covers the Markov Decision Process.
+
+Section 3.7
+
+Tells us how to compute the value function in a 'Dynamic Programming' way.
+I.e. it assumes the markov property then defines the value function in terms of successor value functions.
+This feels like a dynamic programming problem.
+We have to know lots, mostly we do have to know 
+\item the underlying policy
+\item probability of encountering
+
+
+\textit{https://arxiv.org/pdf/1507.04296.pdf}
+cited by 45
+
+Seems to be a harness where there 
