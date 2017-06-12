@@ -35,7 +35,7 @@ A deep neural network (NN) is commonly defined as a neural network with more tha
 A neural network is a typically a collection of neurons (compute nodes) arranged in a network (regular directed acyclic graph).
 In the remainder of this document, we consider NNs with $>1$ hidden layers that have a fully connected forward feed network.
 
-Our NN was implemented using C++11 using ``O3'' optimization flag.
+Our NN was implemented using C++11 with the ``O3'' optimization flag.
 We used the standard library vectors for our primary container for inputs.
 To make our implementation simpler, we leverage standard shared pointers when doing several tasks.
 This has not demonstrated any performance issues, but the unpredictable nature of garbage collection may require being more careful with memory usage.
@@ -44,7 +44,12 @@ Finally, all randomization was performed using the standard uniform random numbe
 Our organization is focused at completing the computation of a network layer as expediently as possible, which we will discuss in section \ref{parallel}.
 The structure indicated below is in a structure-of-arrays (SoA) style to represent a Network Layer.
 
-\ssbFigure{soa.png}
+\begin{lstlisting}
+struct NetworkLayer {
+  vector<vector<float>*> weights;
+  vector<float> biases;
+};
+\end{lstlisting}
 
 Our implementation is able to perform forward propagation on any network layer using three simple variety of computation including.
 \begin{enumerate}
@@ -53,14 +58,18 @@ Our implementation is able to perform forward propagation on any network layer u
 \item Threshold (Perception)
 \end{enumerate}
 Currently, the NN has been constructed to allow all hidden layers to use one variety of computation while the output layer can use a different variety.
-The neural network used in testing was XXX.
+The neural network used in testing was height \netheight and depth \netdepth.
 
-
-\section*{Parallelization}
+\section*{Parallelization and Evaluation}
 
 \label{parallel}
 In regards to parallelization, there are many restrictions disallowing us from parallelizing major portions of our application.
 However, the NN implementation is nearly embarrassingly parallel except for some very regular reduction and stencil dependencies.
+
+All tests were performed on the same machine with no other major processes running except for the development environment and the emulator.
+Each version of the agent was compiled then executed for 30 seconds (approximately 500 AI predictions) in the same emulator state.
+The average prediction time was recorded by inserting instrumentation code to capture elapsed time then outputting the total elapsed time divided by the number of frames measured.
+This is a simple average that might not account for any initialization bias in our code.
 
 \subsection*{Sequential Restrictions}
 There is a serial bottleneck in that our game AI works in a world where each scene depends on the prior.
@@ -68,35 +77,115 @@ This is kin to a serial physics simulation, and is an inherit limitation to buil
 To get more parallelization at this level, we could instead perform multiple simulations in parallel (although this is out of the scope of this project).
 
 \subsection*{Parallelization of Nodes}
-Each node performs a dot product between two vectors of 128 floats (weights and inputs).
-This is a reduction of $O(height)$ or $128$ elements in our system.
+Each node performs a dot product between two vectors of \netheight floats (weights and inputs).
+This is a reduction of $O(height)$ or \netheight elements in our system.
 The granularity of this effort is very vectorizable, but much smaller than the recommended grain size proposed by TBB and Cilk for generic reduction.
 We use OpenMP in our implementation. 
-We reason that there is a high likelihood that the thread spawn overhead outweighs the potential parallelization benefits of doing a sum reduction on 128 elements.
+We reason that there is a high likelihood that the thread spawn overhead outweighs the potential parallelization benefits of doing a sum reduction on \netheight elements.
 
-% TODO Parallel Code
+\begin{lstlisting}
+// Node Compute Code
+float accumulator = 0.0;
+#pragma omp parallel for reduction(+:accumulator)
+for (int i = 0; i < 512; ++i)
+  accumulator += (*input_layer)[i] * (*weights)[i];
+(*output_layer)[p] = accumulator > 0 ? accumulator : 0.01 * accumulator;
+\end{lstlisting}
 
-% TODO Speedup
+Enabling parallelization at this level results in a significant slowdown with increased CPU utilization.
+This can be attributed to being a bad granularity to enable the heavyweight parallelization that OpenMP offers.
+A set of threads being allocated for performing a reduction over \netheight elements is large.
+Additionally, the reduction nature of this computation enforces a strictly sub linear speedup.
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+  \hline
+  Threads & Speedup & CPU Utilization \\ \hline
+  1 & 0.34 & 5 \\
+  2 & 0.35 & 18 \\
+  3 & 0.39 & 31 \\
+  4 & 0.40 & 42 \\
+  \hline
+\end{tabular}
+\end{center}
+
 
 \subsection*{Parallelization of Network Layers}
-Each layer has to perform $O(height)$ or $128$ node computations.
+Each layer has to perform $O(height)$ or \netheight node computations.
 This step is embarrassingly parallel!
 
-% TODO Parallel Code
+\begin{lstlisting}
+forward_propogation(const NetworkLayer &layer, const vector<float> *input_layer, vector<float> *output_layer)
+{
+  // Layer Compute Code
+  #pragma omp parallel for
+  for (int p = 0; p < 512; ++p)
+  {
+    vector<float>  *weights = layer.getWeights(p);
+    const float         *bias = layer.getBias(p);
+    // Node Compute Code
+    ...
+  }
+}
+\end{lstlisting}
 
-% TODO Speedup
+We see parallelization at this level resulting in a positive speedup!
+As we increase the number of threads available we see approximately a $3.1 \times$ speedup for 4 available processors!
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+  \hline
+  Threads & Speedup & CPU Utilization \\ \hline
+  1 & 1.00 & 5 \\
+  2 & 1.91 & 18 \\
+  3 & 2.66 & 31 \\
+  4 & 3.09 & 43 \\
+  \hline
+\end{tabular}
+\end{center}
 
 \subsection*{Parallelization between Network Layers}
-The network as a whole has to perform $O(depth)$ or XXX network layer computations.
+The network as a whole has to perform $O(depth)$ or \netdepth network layer computations.
 This can be reasoned about as a stencil where each node depends on the entire prior layer.
 So we we reason that we can use the recurrence pattern to ripple the computation through the network to achieve some parallelization.
-We notice that this recurrence is actually accomplished using the technique from the prior section.
+We notice that this recurrence is actually fully realized by the ``parallelization of network layers'' technique from the section above.
 
 Alternately, we notice that we could use a staged pipelining approach to be able to actually compute layers in parallel.
 This would enable us to achieve $O(depth)$ speedup, but would also result in an added latency to get a network output for its provided inputs.
 We can emulate the potential speedup achievable by not-modifying the node weights and biases and using the map pattern between network layers.
 
-% TODO Parallel Code
+\begin{lstlisting}
+#pragma omp parallel for
+for (int i = 0; i < 7; ++i)
+{
+  forward_propogation(layers[i], hli, layer_outputs[i]);
+  hli = layer_outputs[i];
+}
+\end{lstlisting}
 
-% TODO Speedup
+We see parallelization at this level resulting in a slowdown.
+We attribute this to the fact that the compiler is compiling to allow parallelization but either (1) there is a synchronization happening between loops or (2) the overhead of initializing scheduling and initializing so few threads is dominating the parallelization.
+The latter seems unlikely based on our investigation of Layer Parallelism seen in the prior section.
+Further investigation is required to determine what is causing this slowdown.
 
+\begin{center}
+\begin{tabular}{|c|c|c|}
+  \hline
+  Threads & Speedup & CPU Utilization \\ \hline
+  1 & 1.00 & 5 \\
+  2 & 0.56 & 18 \\
+  3 & 0.58 & 31 \\
+  4 & 0.49 & 43 \\
+  \hline
+\end{tabular}
+\end{center}
+
+
+\subsection*{Performance Discussion}
+Obviously, all of these parallelization schemes to achieve real time performance from our AI engine are orthogonal.
+We can apply any one, two, or all three of them as valid parallelization schemes.
+Unfortunately, after our preliminary investigation, we found that the node parallelization and network parallelization actually result in more overheads than parallelization and we achieve a slowdown from using these techniques!
+As such, we decide empirically that for our network of size on a consumer machine with four cores, only Network Layer Parallelization should be enabled to maximize performance.
+This is portrayed as the ``Per Layer'' series in the following graphic.
+
+\ssbFigure{speedup.png}

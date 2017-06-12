@@ -11,7 +11,6 @@ We explode this data flow to reveal critical tasks that are completed per frame.
 
 \ssbFigure{SSBAI_tasks.png}
 
-
 \section*{The Hook: Emulator Modification}
 First, we inserted one simple hook was into the emulator's per-frame-update function. 
 We used this hook to get a pointer to the N64 memory space. 
@@ -36,29 +35,37 @@ As an example, to find the memory offset associated to the location of a charact
 \item Run an initial scan over the N64 virtual address space
 \item Move the character to the left in the emulator
 \item Run a diff in Cheat Engine
-\item Repeat step 2 and 3 until the relevent/correlated virtual address space is only a few addresses.
+\item Repeat step 2 and 3 until the relevant/correlated virtual address space is only a few addresses.
 \end{enumerate}
 At this point, we have determined the memory address that is correlated to the action of the character moving.
-Doing some investigation of the nearby memory spaces, we easily find the address corresponding to the floating point values of the characters x and y position!
+Doing some investigation of the correlated memory addresses and nearby memory spaces, we easily find the address corresponding to the floating point values of the characters x and y position!
 
 \section*{Extracting State Values}
 
+State extraction was performed using very crude memory manipulation.
+A set of macros was defined for reading arbitrary memory into our data structures.
+Issues arose with correctly determining the memory offset: original calculations of the memory offset were incorrect which was only discovered between successive runs after restarting Visual Studio.
+The ultimate solution was to find the relevant data structure and get the offset of that from the emulated N64 memory address all from within Visual Studio.
+The result is that state gathering works across all development machines successfully.
+
+Normalization of the state was also performed.
+This was simply moving all data members to the range of $(-1.0, 1.0)$.
+We used domain specific information (e.g. SSB map limits, SSB max damage) to get the normalization range.
+We also clipped the values in case somehow the limits are exceeded during game play to ensure clean processed data.
+
 \section*{Enacting Actions}
 
+Pushing an action into the emulator was trivial using a unioned bit-field.
+The controller data structure in the emulated N64 memory space is provided by the N64 emulator, so there was no need to hunt down the data structure via cheat engine.
 
-the to the memory refernce will be made to the emulator for the process of state gathering and enacting actions.
-An independent AI library (SSBAI) will be constructed to perform the AI calculations and ultimately decide what action Kirby will take.
-
-\url{https://github.com/terminalstderr/SuperSmashBrosAI}
-
-Below is a serial psuedocode perspective of all of the tasks that must be completed per frame.
-This is in essence the critical path of our implementation.
-\begin{verbatim}
-Emulator.processInputs(ControllerInputs);
-Emulator.updateGameState();
-State = StateGatherer(Emulator.memory);
-State.preprocess();
-NextAction = SsbaiEngine.predict(State);
-ControllerInputs = ActionPusher(NextAction);
-\end{verbatim}
-
+The possible action space was originally $2^{30}$, we limited our scope to $2^7$. 
+Only combinations of the following actions are permitted:
+\begin{itemize}
+  \item Attack
+  \item Special
+  \item Shield
+  \item Jump
+  \item Sprint/Walk
+  \item Left/Right
+  \item Up/Down
+\end{itemize}
